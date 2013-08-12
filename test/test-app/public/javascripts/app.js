@@ -1,5 +1,10 @@
 window.onload = function() {
 
+  var info = document.getElementById('info');
+  if (info && window.devicePixelRatio) {
+    info.innerHTML = 'devicePixelRatio: ' + window.devicePixelRatio;
+  }
+
   var ctx1 = document.getElementById('canvas1').getContext('2d');
   var ctx2 = document.getElementById('canvas2').getContext('2d');
   var ctx3 = document.getElementById('canvas3').getContext('2d');
