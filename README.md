@@ -119,7 +119,9 @@ var xy = new Xy(ctx, { xTics: 0.5 } );
 
 setInterval(function() {
 
-  xy.draw(datasets, true); // If the second argument is set to true, the update of axis range and tics is forced.
+  // If the second argument of draw() is set to true, the axis range
+  // and tics will be updated based on the current config and datasets.
+  xy.draw(datasets, true);
 
   // Modify datasets here
 }, 1000 / 60);
@@ -137,7 +139,7 @@ var xy = new Xy(ctx, { smooth: -3 });
 xy.draw(datasets);
 ```
 
-![Fig.9](https://raw.github.com/thunder9/xy.js/master/docs/fig8.png)
+![Fig.9](https://raw.github.com/thunder9/xy.js/master/docs/fig9.png)
 
 # Options
 
