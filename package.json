@@ -1,0 +1,19 @@
+{
+  "name": "xy",
+  "author": {
+    "name": "thunder9",
+    "url": "https://github.com/thunder9"
+  },
+  "main": "dist/xy.js",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thunder9/xy.js.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-concat": "0.3.0",
+    "grunt-contrib-uglify": "0.2.0"
+  }
+}

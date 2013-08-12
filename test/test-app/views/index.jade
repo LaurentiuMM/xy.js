@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  p The default
+  canvas#canvas1(width='500', height='500')
+  p Disable smoothing
+  canvas#canvas2(width='500', height='500')
+  p Hide lines
+  canvas#canvas3(width='500', height='500')
+  p Hide points
+  canvas#canvas4(width='500', height='500')
+  p Set lower bound of x to 0
+  canvas#canvas5(width='500', height='500')
+  p Set tic of x to 0.5 / Rotating labels (45°)
+  canvas#canvas6(width='500', height='500')
+  p Set tic of x to 0.34 / Rotating labels (90°)
+  canvas#canvas7(width='500', height='500')
+  p Live update of tics
+  canvas#canvas8(width='500', height='500')
+  p Large magnitude, negative smoothing factor (a strange effect)
+  canvas#canvas9(width='500', height='500')
+  p Can draw smooth curves correctly when large scale gap exists between x and y.
+  canvas#canvas10(width='500', height='500')
