@@ -3,6 +3,8 @@ Xy.js
 
 Xy.js is a lightweight, easy-to-customize, Canvas-based JavaScript 2D plotting library. It will draw a [Chart.js](https://github.com/nnnick/Chart.js)-flavored lovely point-line chart by default.
 
+[Demo](http://jsfiddle.net/thunder9/J7Z4w/embedded/result,html,css,resources/presentation/)
+
 # Installation
 
 Run the following:
