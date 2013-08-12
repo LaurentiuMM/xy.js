@@ -25,7 +25,6 @@
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
 
-    ctx.font = opts.labelFontStyle + ' ' + opts.labelFontSize + 'px ' + opts.labelFontFamily;
   }
 
   Xy.prototype.draw = function(datasets, updateTics) {
@@ -34,6 +33,8 @@
     var opts = this.options;
 
     if (!this.xTics || !this.yTics || updateTics) {
+      ctx.font = opts.labelFontStyle + ' ' + opts.labelFontSize + 'px ' + opts.labelFontFamily;
+
       this.xTics = createXTics(this, datasets);
       this.yTics = createYTics(this, datasets);
 
