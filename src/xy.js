@@ -12,7 +12,7 @@
       for (var prop in opts) this[prop] = opts[prop];
     }
     ctor.prototype = Xy.defaults;
-    opts = this.options = new ctor(opts);
+    this.options = new ctor(opts);
 
     this.width = ctx.canvas.width;
     this.height = ctx.canvas.height;
@@ -24,7 +24,6 @@
       ctx.canvas.height = this.height * window.devicePixelRatio;
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
-
   }
 
   Xy.prototype.draw = function(datasets, updateTics) {
