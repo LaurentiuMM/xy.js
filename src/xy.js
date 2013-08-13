@@ -86,8 +86,8 @@
     if (opts.scale) {
       ctx.strokeStyle = opts.scaleColor;
       ctx.lineWidth = opts.scaleWidth;
-      this.drawXScale(this.xTics, this.yTics[0]);
-      this.drawYScale(this.yTics, this.xTics[0]);
+      this.drawXScale(this.xRange, this.xTics, this.yTics[0]);
+      this.drawYScale(this.yRange, this.yTics, this.xTics[0]);
     }
 
     if (opts.label) {
@@ -191,19 +191,19 @@
     }
   };
 
-  Xy.prototype.drawXScale = function(tics, y) {
+  Xy.prototype.drawXScale = function(xrange, tics, y) {
     var ctx = this.ctx;
     ctx.beginPath();
-    ctx.xy.moveTo(tics[0], y);
-    ctx.xy.lineTo(tics[tics.length - 1], y);
+    ctx.xy.moveTo(xrange[0], y);
+    ctx.xy.lineTo(xrange[1], y);
     ctx.stroke();
   };
 
-  Xy.prototype.drawYScale = function(tics, x) {
+  Xy.prototype.drawYScale = function(yrange, tics, x) {
     var ctx = this.ctx;
     ctx.beginPath();
-    ctx.xy.moveTo(x, tics[0]);
-    ctx.xy.lineTo(x, tics[tics.length - 1]);
+    ctx.xy.moveTo(x, yrange[0]);
+    ctx.xy.lineTo(x, yrange[1]);
     ctx.stroke();
   };
 
