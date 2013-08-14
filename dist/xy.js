@@ -8,11 +8,8 @@
   function Xy(ctx, opts) {
     this.ctx = ctx;
 
-    function ctor(opts) {
-      for (var prop in opts) this[prop] = opts[prop];
-    }
-    ctor.prototype = Xy.defaults;
-    this.options = new ctor(opts);
+    this.options = Object.create(Xy.defaults);
+    for (var prop in opts) this.options[prop] = opts[prop];
 
     this.width = ctx.canvas.width;
     this.height = ctx.canvas.height;
@@ -512,89 +509,120 @@
     var __w = funs.width || identity;
     var __h = funs.height || identity;
     var __r = funs.radius || identity;
+    var __m = funs.matrix || function(x, y, w, h, r) { return [__x(x), __y(y), __w(w), __h(h), __r(r)]; };
 
     this.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
-      ctx.arc(__x(x), __y(y), __r(radius), startAngle, endAngle, anticlockwise);
+      var _ = __m(x, y, null, null, radius);
+      ctx.arc(_[0], _[1], _[4], startAngle, endAngle, anticlockwise);
     };
 
     this.arcTo = function(x1, y1, x2, y2, radius) {
-      ctx.arcTo(__x(x1), __y(y1), __x(x2), __y(y2), __r(radius));
+      var _1 = __m(x1, y1, null, null, radius);
+      var _2 = __m(x2, y2, null, null, radius);
+      ctx.arcTo(_1[0], _1[1], _2[0], _2[1], _1[4]);
     };
 
     this.bezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
-      ctx.bezierCurveTo(__x(cp1x), __y(cp1y), __x(cp2x), __y(cp2y), __x(x), __y(y));
+      var _cp1 = __m(cp1x, cp1y);
+      var _cp2 = __m(cp2x, cp2y);
+      var _ = __m(x, y);
+      ctx.bezierCurveTo(_cp1[0], _cp1[1], _cp2[0], _cp2[1], _[0], _[1]);
     };
 
     this.clearRect = function(x, y, width, height) {
-      ctx.clearRect(__x(x), __y(y), __w(width), __h(height));
+      var _ = __m(x, y, width, height);
+      ctx.clearRect(_[0], _[1], _[2], _[3]);
     };
 
     this.createImageData = function(width, height) {
-      return ctx.createImageData(__w(width), __h(height));
+      var _ = __m(null, null, width, height);
+      return ctx.createImageData(_[2], _[3]);
     };
 
     this.createLinearGradient = function(x0, y0, x1, y1) {
-      return ctx.createLinearGradient(__x(x0), __y(y0), __x(x1), __y(y1));
+      var _0 = __m(x0, y0);
+      var _1 = __m(x1, y1);
+      return ctx.createLinearGradient(_0[0], _0[1], _1[0], _1[1]);
     };
 
     this.createRadialGradient = function(x0, y0, r0, x1, y1, r1) {
-      return ctx.createRadialGradient(__x(x0), __y(y0), __r(r0), __x(x1), __y(y1), __r(r1));
+      var _0 = __m(x0, y0, null, null, r0);
+      var _1 = __m(x1, y1, null, null, r1);
+      return ctx.createRadialGradient(_0[0], _0[1], _0[4], _1[0], _1[1], _1[4]);
     };
 
     this.drawImage = function(image, x, y, w, h, dx, dy, dw, dh) {
-      if (arguments.length === 3) ctx.drawImage(image, __x(x), __y(y));
-      else if (arguments.length === 5) ctx.drawImage(image, __x(x), __y(y), __w(w), __h(h));
-      else ctx.drawImage(image, x, y, w, h, __x(dx), __y(dy), __w(dw), __h(dh));
+      if (arguments.length === 9) {
+        var _ = __m(dx, dy, dw, dh);
+        ctx.drawImage(image, x, y, w, h, _[0], _[1], _[2], _[3]);
+      } else {
+        var _ = __m(x, y, w, h);
+        if (arguments.length === 5) ctx.drawImage(image, _[0], _[1], _[2], _[3]);
+        else ctx.drawImage(image, _[0], _[1]);
+      }
     };
 
     this.fillRect = function(x, y, width, height) {
-      ctx.fillRect(__x(x), __y(y), __w(width), __h(height));
+      var _ = __m(x, y, width, height);
+      ctx.fillRect(_[0], _[1], _[2], _[3]);
     };
 
     this.fillText = function(text, x, y, maxWidth) {
-      if (arguments.length === 4) ctx.fillText(text, __x(x), __y(y), maxWidth);
-      else ctx.fillText(text, __x(x), __y(y));
+      var _ = __m(x, y);
+      if (arguments.length === 4) ctx.fillText(text, _[0], _[1], maxWidth);
+      else ctx.fillText(text, _[0], _[1]);
     };
 
     this.getImageData = function(sx, sy, sw, sh) {
-      return ctx.getImageData(__x(sx), __y(sy), __w(sw), __h(sh));
+      var _ = __m(sx, sy, sw, sh);
+      return ctx.getImageData(_[0], _[1], _[2], _[3]);
     };
 
     this.isPointInPath = function(x, y) {
-      return ctx.isPointInPath(__x(x), __y(y));
+      var _ = __m(x, y);
+      return ctx.isPointInPath(_[0], _[1]);
     };
 
     this.lineTo = function(x, y) {
-      ctx.lineTo(__x(x), __y(y));
+      var _ = __m(x, y);
+      ctx.lineTo(_[0], _[1]);
     };
 
     this.moveTo = function(x, y) {
-      ctx.moveTo(__x(x), __y(y));
+      var _ = __m(x, y);
+      ctx.moveTo(_[0], _[1]);
     };
 
     this.putImageData = function(imagedata, dx, dy, sx, sy, sw, sh) {
-      ctx.putImageData(imagedata, __x(dx), __y(dy), sx, sy, sw, sh);
+      var _ = __m(dx, dy);
+      ctx.putImageData(imagedata, _[0], _[1], sx, sy, sw, sh);
     };
 
     this.quadraticCurveTo = function(cpx, cpy, x, y) {
-      ctx.quadraticCurveTo(__x(cpx), __y(cpy), __x(x), __y(y));
+      var _cp = __m(cpx, cpy);
+      var _ = __m(x, y);
+      ctx.quadraticCurveTo(_cp[0], _cp[1], _[0], _[1]);
     };
 
     this.rect = function(x, y, w, h) {
-      ctx.rect(__x(x), __y(y), __w(w), __h(h));
+      var _ = __m(x, y, w, h);
+      ctx.rect(_[0], _[1], _[2], _[3]);
     };
 
     this.strokeRect = function(x, y, w, h) {
-      ctx.strokeRect(__x(x), __y(y), __w(w), __h(h));
+      var _ = __m(x, y, w, h);
+      ctx.strokeRect(_[0], _[1], _[2], _[3]);
     };
 
     this.strokeText = function(text, x, y, maxWidth) {
-      if (arguments.length === 4) ctx.strokeText(text, __x(x), __y(y), maxWidth);
-      else ctx.strokeText(text, __x(x), __y(y));
+      var _ = __m(x, y);
+      if (arguments.length === 4) ctx.strokeText(text, _[0], _[1], maxWidth);
+      else ctx.strokeText(text, _[0], _[1]);
     };
 
     this.translate = function(x, y) {
-      ctx.translate(__x(x), __y(y));
+      var _ = __m(x, y);
+      ctx.translate(_[0], _[1]);
     };
   }
 
