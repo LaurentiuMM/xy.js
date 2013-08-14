@@ -145,7 +145,7 @@ xy.draw(datasets);
 
 # Options
 
-Options can be passed to the constructor or edited via `options` property of the instance.
+Options can be passed to the constructor or set via `options` property of the instance.
 
 | Name              | Default             | Description                                              |
 | ------------------|---------------------|----------------------------------------------------------|
@@ -161,9 +161,9 @@ Options can be passed to the constructor or edited via `options` property of the
 | gridWidth         | `1`                 | width of grid lines                                      |
 | label             | `true`              | visibility of grid lines, `true` = show, `false` = hide  |
 | labelFontFamily   | `"'Arial'"`         | font family of label characters                          |
-| labelFontSize     | `20`                | font size of label characters                            |
+| labelFontSize     | `20`                | font size of label characters in px                      |
 | labelFontStyle    | `'normal'`          | font style of label characters                           |
-| labelColor        | `#666`              | color of label characters                                |
+| labelColor        | `'#666'`            | color of label characters                                |
 | point             | `true`              | visibility of points, `true` = show, `false` = hide      |
 | pointCircleRadius | `8`                 | radius of the circles that represent points              |
 | pointStrokeWidth  | `4`                 | width of peripheral line of the circles                  |
@@ -172,6 +172,74 @@ Options can be passed to the constructor or edited via `options` property of the
 | smooth            | `0.3`               | degree of smoothing, falsy = disabled smoothing          |
 
 # Customization
+
+## Overridable methods
+
+In Xy, all drawing operations are customizable. To define your own drawing operations, you can override the following methods:
+
+### Xy.prototype.measureXLabelSize = function(tics, fontSize, width) {...}
+
+This method should return an object that has `width`, `height` and `rot` properties. The `width` and `height` properies should be set the maximum sizes of the labels that are drawn based on the given `tics` (array of numbers), `fontSize` (font size of label characters in px) and `width` (the length of x-axis range in px) in px. The `rot` property should be set the rotation angle of the labels.
+
+### Xy.prototype.measureYLabelSize = function(tics, fontSize) {...}
+
+This method should return an object that has `width` and `height` properties. Each property should be set the maximum sizes of the labels that are drawn based on the given `tics` (array of numbers) and `fontSize` (font size of label characters in px) in px.
+
+### Xy.prototype.before = function() {}
+
+This method will be called before all drawing operations. You can draw a background graphics in this method.
+
+### Xy.prototype.drawXGrids = function(tics, yrange) {...}
+
+This method should draw the grid lines that are crossing at given `tics` (numbers on the x-axis). The lines should be drawn in the given range of y-axis (`yrange`).
+
+### Xy.prototype.drawYGrids = function(tics, xrange) {...}
+
+This method should the draw grid lines that are crossing at given `tics` (numbers on the y-axis). The lines should be drawn in the given range of x-axis (`xrange`).
+
+### Xy.prototype.drawXScale = function(xrange, tics, y) {...}
+
+This method should draw the scale line that are crossing at given point of the y-axis (`y`). The line should be drawn in the given range of the x-axis (`xrange`). You can use `tics` (numbers on the x-axis) to draw tics.
+
+### Xy.prototype.drawYScale = function(yrange, tics, x) {...}
+
+This method should draw the scale line that are crossing at given point of the x-axis (`x`). The line should be drawn in the given range of the y-axis (`yrange`). You can use `tics` (numbers on the y-axis) to draw tics.
+
+### Xy.prototype.drawXLabels = function(tics, y, rot) {...}
+
+This method should draw the labels (stringified `tics`'s numbers) for the x-axis. The top of the label characters should be located at `y`. The lebels should be rotated at given angle (`rot`).
+
+### Xy.prototype.drawYLabels = function(tics, x) {...}
+
+This method should draw the labels (stringified `tics`'s numbers) for the y-axis. The right edge of the labels should be located at `x`.
+
+### Xy.prototype.drawLines = function(datasets) {...}
+
+This method should draw lines or cureves based on the given `datasets`.
+
+### Xy.prototype.drawPoints = function(datasets) {...}
+
+This method should plot points (circles typically) based on the given `datasets`.
+
+### Xy.prototype.plot = function(datasets) {}
+
+You can plot something (based on `datasets` typically) to the clipped chart region.
+
+### Xy.prototype.after = function() {}
+
+This method will be called after all drawing operations. You can draw an overlaid graphics in this method.
+
+## Drawing
+
+To draw something freely in the above methods, you can use directly the CanvasRenderingContext2D's methods and its proxies, via the `ctx` / `ctx.xy` / `ctx.nxy` properties of the instance.
+
+| Name    | Description                                                                              |
+| ------- |------------------------------------------------------------------------------------------|
+| ctx     | an instance of the CanvasRenderingContext2D                                                  |
+| ctx.xy  | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments of `x` and `y` can be specified as coordinates of a standard x-y coordinate system. |
+| ctx.nxy | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments of `x` and `y` can be specified as coordinates of a normalized version of a x-y coordinate system (the length of x/y-axis range is normalized to 1). |
+
+## Example
 
 # License
 
