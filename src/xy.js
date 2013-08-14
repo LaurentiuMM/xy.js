@@ -8,11 +8,8 @@
   function Xy(ctx, opts) {
     this.ctx = ctx;
 
-    function ctor(opts) {
-      for (var prop in opts) this[prop] = opts[prop];
-    }
-    ctor.prototype = Xy.defaults;
-    this.options = new ctor(opts);
+    this.options = Object.create(Xy.defaults);
+    for (var prop in opts) this.options[prop] = opts[prop];
 
     this.width = ctx.canvas.width;
     this.height = ctx.canvas.height;
