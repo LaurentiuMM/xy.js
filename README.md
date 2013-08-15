@@ -235,11 +235,106 @@ To draw something freely in the above methods, you can use directly the CanvasRe
 
 | Name    | Description                                                                              |
 | ------- |------------------------------------------------------------------------------------------|
-| ctx     | an instance of the CanvasRenderingContext2D                                                  |
+| ctx     | an instance of the CanvasRenderingContext2D                                              |
 | ctx.xy  | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments of `x` and `y` can be specified as coordinates of a standard x-y coordinate system. |
-| ctx.nxy | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments of `x` and `y` can be specified as coordinates of a normalized version of a x-y coordinate system (the length of x/y-axis range is normalized to 1). |
+| ctx.nxy | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments of `x` and `y` can be specified as coordinates of a normalized version of a x-y coordinate system (the length of x/y-axis range in the chart is normalized to 1). |
 
 ## Example
+
+Here is an example that overrides `before` and `plot` methods.
+
+```javascript
+
+// Get a Canvas 2d context.
+var ctx = document.getElementById('myCanvas').getContext('2d');
+
+// Create an instance of `Xy`.
+var xy = new Xy(ctx, {
+  point: false,
+  smooth: -0.6
+});
+
+// A function to generate color randomly.
+function genColor() {
+  function c() { return (Math.round(Math.random() * 255)); };
+  var rgb = [c(), c(), c()];
+  return '#' + ((rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16);
+}
+
+// Define datasets
+var datasets = [
+  {
+    lineColor: 'rgba(220,220,220,0.5)',
+    pointStrokeColor: '#fff',
+    data: [
+      // x, y, radius, color
+      [ 1,  0, 10, genColor()],
+      [-1,  0, 20, genColor()],
+      [ 0,  1, 30, genColor()],
+      [ 0, -1, 40, genColor()],
+    ]
+  }
+];
+
+var rectColor = genColor();
+
+// Override the `before`.
+xy.before = function() {
+  var ctx = this.ctx;
+  ctx.fillStyle = rectColor;
+
+  ctx.beginPath();
+  ctx.xy.rect(-0.75, 0.6, 0.2, 0.2);
+  ctx.xy.rect(-0.75, -0.6, 1.5, 0.2);
+  ctx.fill();
+};
+
+// Override the `plot`.
+xy.plot = function(datasets) {
+  var ctx = this.ctx;
+  var data = datasets[0].data;
+
+  for (var i = 0; i < data.length; i++) {
+    ctx.fillStyle = data[i][3];
+    ctx.strokeStyle = datasets[0].pointStrokeColor;
+
+    ctx.beginPath();
+    ctx.xy.arc(data[i][0], data[i][1], data[i][2], 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+
+  for (var i = 0; i < data.length; i++) {
+    ctx.fillStyle = data[i > 0 ? i - 1 : data.length - 1][3];
+    var x = Math.round(data[i][0] * 100) / 100;
+    var y = Math.round(data[i][1] * 100) / 100;
+    ctx.xy.fillText('(' + x + ',' + y + ')', data[i][0], data[i][1]);
+  }
+};
+
+// Animaition loop
+setInterval(function() {
+
+  // Draw chart
+  xy.draw(datasets);
+
+  // Change the coordinates
+  var data = datasets[0].data;
+  for (var j = 0; j < data.length; j++) {
+    var dx = (Math.random() - 0.5) / xy.xLength * 0.033;
+    var dy = (Math.random() - 0.5) / xy.yLength * 0.033;
+    data[j][0] += dx;
+    data[j][1] += dy;
+  }
+}, 1000 / 60);
+```
+
+![Customize01](https://raw.github.com/thunder9/xy.js/master/docs/customize01.png)
+
+[JSFiddle](http://jsfiddle.net/thunder9/jzHvh/embedded/result,js,html,css,resources/presentation/)
 
 # License
 
