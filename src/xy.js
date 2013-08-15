@@ -63,12 +63,16 @@
 
       ctx.xy = new Transform(ctx, {
         x: function(x) { return (x - xRange[0]) * xScale + xOffset; },
-        y: function(y) { return (yRange[0] - y) * yScale + height - yOffset; }
+        y: function(y) { return (yRange[0] - y) * yScale + height - yOffset; },
+        width: function(w) { return w * xScale; },
+        height: function(h) { return -h * yScale; }
       });
 
       ctx.nxy = new Transform(ctx, {
         x: function(x) { return (x * xLength - xRange[0]) * xScale + xOffset; },
-        y: function(y) { return (yRange[0] - y * yLength) * yScale + height - yOffset; }
+        y: function(y) { return (yRange[0] - y * yLength) * yScale + height - yOffset; },
+        width: function(w) { return w * xLength * xScale; },
+        height: function(h) { return -h * yLength * yScale; }
       });
     }
 
