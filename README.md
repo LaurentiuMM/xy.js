@@ -256,7 +256,7 @@ var xy = new Xy(ctx, {
 
 // A function to generate color randomly.
 function genColor() {
-  function c() { return (Math.round(Math.random() * 255)); };
+  function c() { return (Math.round(Math.random() * 255)); }
   var rgb = [c(), c(), c()];
   return '#' + ((rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16);
 }
@@ -267,7 +267,7 @@ var datasets = [
     lineColor: 'rgba(220,220,220,0.5)',
     pointStrokeColor: '#fff',
     data: [
-      // x, y, radius, color
+      // x, y, radius(px), color
       [ 1,  0, 10, genColor()],
       [-1,  0, 20, genColor()],
       [ 0,  1, 30, genColor()],
@@ -292,42 +292,45 @@ xy.before = function() {
 // Override the `plot`.
 xy.plot = function(datasets) {
   var ctx = this.ctx;
-  var data = datasets[0].data;
 
-  for (var i = 0; i < data.length; i++) {
-    ctx.fillStyle = data[i][3];
-    ctx.strokeStyle = datasets[0].pointStrokeColor;
+  for (var i = 0; i < datasets.length; i++) {
+    var data = datasets[i].data;
+    ctx.strokeStyle = datasets[i].pointStrokeColor;
 
-    ctx.beginPath();
-    ctx.xy.arc(data[i][0], data[i][1], data[i][2], 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-  }
+    for (var j = 0; j < data.length; j++) {
+      ctx.fillStyle = data[j][3];
 
-  ctx.textBaseline = 'middle';
-  ctx.textAlign = 'center';
+      ctx.beginPath();
+      ctx.xy.arc(data[j][0], data[j][1], data[j][2], 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
 
-  for (var i = 0; i < data.length; i++) {
-    ctx.fillStyle = data[i > 0 ? i - 1 : data.length - 1][3];
-    var x = Math.round(data[i][0] * 100) / 100;
-    var y = Math.round(data[i][1] * 100) / 100;
-    ctx.xy.fillText('(' + x + ',' + y + ')', data[i][0], data[i][1]);
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+
+    for (var j = 0; j < data.length; j++) {
+      ctx.fillStyle = data[j > 0 ? j - 1 : data.length - 1][3];
+      var x = Math.round(data[j][0] * 100) / 100;
+      var y = Math.round(data[j][1] * 100) / 100;
+      ctx.xy.fillText('(' + x + ',' + y + ')', data[j][0], data[j][1]);
+    }
   }
 };
 
-// Animaition loop
+// Animation loop
 setInterval(function() {
 
   // Draw chart
   xy.draw(datasets);
 
   // Change the coordinates
-  var data = datasets[0].data;
-  for (var j = 0; j < data.length; j++) {
-    var dx = (Math.random() - 0.5) / xy.xLength * 0.033;
-    var dy = (Math.random() - 0.5) / xy.yLength * 0.033;
-    data[j][0] += dx;
-    data[j][1] += dy;
+  for (var i = 0; i < datasets.length; i++) {
+    var data = datasets[i].data;
+    for (var j = 0; j < data.length; j++) {
+      data[j][0] += (Math.random() - 0.5) * 0.0165;
+      data[j][1] += (Math.random() - 0.5) * 0.0165;
+    }
   }
 }, 1000 / 60);
 ```
