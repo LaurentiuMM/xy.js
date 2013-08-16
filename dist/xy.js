@@ -58,22 +58,43 @@
       var xLength = this.xLength = xRange[1] - xRange[0];
       var yLength = this.yLength = yRange[1] - yRange[0];
 
-      var xScale = (width - xOffset - padding) / xLength;
-      var yScale = (height - yOffset - padding) / yLength;
+      var xScaling = (width - xOffset - padding) / xLength;
+      var yScaling = (height - yOffset - padding) / yLength;
 
-      ctx.xy = new Transform(ctx, {
-        x: function(x) { return (x - xRange[0]) * xScale + xOffset; },
-        y: function(y) { return (yRange[0] - y) * yScale + height - yOffset; },
-        width: function(w) { return w * xScale; },
-        height: function(h) { return -h * yScale; }
-      });
+      (function() {
 
-      ctx.nxy = new Transform(ctx, {
-        x: function(x) { return (x * xLength - xRange[0]) * xScale + xOffset; },
-        y: function(y) { return (yRange[0] - y * yLength) * yScale + height - yOffset; },
-        width: function(w) { return w * xLength * xScale; },
-        height: function(h) { return -h * yLength * yScale; }
-      });
+        function transformX(x, length) { return (x * length - xRange[0]) * xScaling + xOffset; }
+        function transformY(y, length) { return (yRange[0] - y * length) * yScaling + height - yOffset; }
+        function scaleX(x, length) { return x * length * xScaling; }
+        function scaleY(y, length) { return -y * length * yScaling; }
+
+        ctx.xy = new Transform(ctx, {
+          x: curry2(transformX)(1),
+          y: curry2(transformY)(1)
+        });
+
+        ctx.xywhr = new Transform(ctx, {
+          x: curry2(transformX)(1),
+          y: curry2(transformY)(1),
+          width: curry2(scaleX)(1),
+          height: curry2(scaleY)(1),
+          radius: opts.scalingRadius === 'x' ? curry2(scaleX)(1) : curry2(scaleY)(-1)
+        });
+
+        ctx.nxy = new Transform(ctx, {
+          x: curry2(transformX)(xLength),
+          y: curry2(transformY)(yLength)
+        });
+
+        ctx.nxywhr = new Transform(ctx, {
+          x: curry2(transformX)(xLength),
+          y: curry2(transformY)(yLength),
+          width: curry2(scaleX)(xLength),
+          height: curry2(scaleY)(yLength),
+          radius: opts.scalingRadius === 'x' ? curry2(scaleX)(xLength) : curry2(scaleY)(-yLength)
+        });
+      })();
+
     }
 
     ctx.clearRect(0, 0, this.width, this.height);
@@ -129,6 +150,14 @@
 
     this.after();
   };
+
+  function curry2(fun) {
+    return function(secondArg) {
+      return function(firstArg) {
+        return fun(firstArg, secondArg);
+      };
+    };
+  }
 
   Xy.prototype.measureXLabelSize = function(tics, fontSize, width) {
     var ctx = this.ctx;
@@ -476,7 +505,9 @@
     line: true,
     lineWidth: 4,
 
-    smooth: 0.3
+    smooth: 0.3,
+
+    scalingRadius: 'x'
   };
 
   this.Xy = Xy;
