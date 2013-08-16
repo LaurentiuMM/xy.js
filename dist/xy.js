@@ -385,16 +385,17 @@
     return generateTics(parameters.lower, parameters.upper, parameters.incr);
   }
 
-  var effectiveDigitsParser = /0*$|\.\d*/;
+  var effectiveDigitsParser = /0*$|\.\d*|e[+-]\d+/;
 
   function generateTics(lower, upper, incr) {
     var effective = effectiveDigitsParser.exec(incr)[0];
-    var power = Math.pow(10, /\./.test(effective) ? effective.length - 1 : -effective.length);
+    var power = Math.pow(10, /e/.test(effective)
+      ? -effective.substring(1) : /\./.test(effective) ? effective.length - 1 : -effective.length);
     var tics = [];
     var i = 0;
     var t;
     lower = incr * Math.ceil(lower / incr);
-    while ((t = lower + i * incr) <= upper) tics[i++] = Math.round(t * power) / power;
+    while ((t = Math.round((lower + i * incr) * power) / power) <= upper) tics[i++] = t;
     return tics;
   }
 
@@ -417,7 +418,7 @@
     if (parameters.upper !== 'auto') upper = parameters.upper;
 
     if (parameters.incr === 'auto') {
-      for (var numberOfTics = 2; numberOfTics < canvasSize; numberOfTics++) {
+      for (var numberOfTics = 1; numberOfTics < canvasSize; numberOfTics++) {
         var incr = quantizeTics(upper - lower, numberOfTics);
         var labelSize = measureFun(generateTics(lower, upper, incr));
         if (canvasSize / (labelSize.hop * 1.5) < numberOfTics) break;
