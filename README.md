@@ -170,6 +170,7 @@ Options can be passed to the constructor or set via `options` property of the in
 | line              | `true`              | visibility of lines, `true` = show, `false` = hide       |
 | lineWidth         | `4`                 | width of lines                                           |
 | smooth            | `0.3`               | degree of smoothing, falsy = disabled smoothing          |
+| scalingRadius     | `'x'`               | scaling for argument `radius` of the CanvasRenderingContext2D's methods, `'x'` = same scaling as x-axis, `'y'` = same scaling as y-axis |
 
 # Customization
 
@@ -231,13 +232,15 @@ This method will be called after all drawing operations. You can draw an overlai
 
 ## Drawing
 
-To draw something freely in the above methods, you can use directly the CanvasRenderingContext2D's methods and its proxies, via the `ctx` / `ctx.xy` / `ctx.nxy` properties of the instance.
+To draw something freely in the above methods, you can use directly the CanvasRenderingContext2D's methods and its proxies, via the `ctx` / `ctx.xy` / `ctx.xywhr` / `ctx.nxy` / `ctx.nxywhr` properties of the instance.
 
 | Name    | Description                                                                              |
 | ------- |------------------------------------------------------------------------------------------|
 | ctx     | an instance of the CanvasRenderingContext2D                                              |
-| ctx.xy  | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments of `x` and `y` can be specified as coordinates of a standard x-y coordinate system. |
-| ctx.nxy | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments of `x` and `y` can be specified as coordinates of a normalized version of a x-y coordinate system (the length of x/y-axis range in the chart is normalized to 1). |
+| ctx.xy  | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments `x` and `y` can be specified as coordinates of a standard x-y coordinate system. |
+| ctx.xywhr | an extended version of `ctx.xy` that is added transformations for the arguments `width`, `height` and `radius`. |
+| ctx.nxy | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments `x` and `y` can be specified as coordinates of a normalized version of a x-y coordinate system (the length of x/y-axis range in the chart is normalized to 1). |
+| ctx.nxywhr | an extended version of `ctx.nxy` that is added transformations for the arguments `width`, `height` and `radius`. |
 
 ## Example
 
@@ -267,11 +270,11 @@ var datasets = [
     lineColor: 'rgba(220,220,220,0.5)',
     pointStrokeColor: '#fff',
     data: [
-      // x, y, radius(px), color
-      [ 1,  0, 10, genColor()],
-      [-1,  0, 20, genColor()],
-      [ 0,  1, 30, genColor()],
-      [ 0, -1, 40, genColor()],
+      // x, y, radius, color
+      [ 1,  0, 0.05, genColor()],
+      [-1,  0, 0.1, genColor()],
+      [ 0,  1, 0.15, genColor()],
+      [ 0, -1, 0.2, genColor()],
     ]
   }
 ];
@@ -284,8 +287,8 @@ xy.before = function() {
   ctx.fillStyle = rectColor;
 
   ctx.beginPath();
-  ctx.xy.rect(-0.75, 0.6, 0.2, 0.2);
-  ctx.xy.rect(-0.75, -0.6, 1.5, 0.2);
+  ctx.xywhr.rect(-0.75, 0.6, 0.2, 0.2);
+  ctx.xywhr.rect(-0.75, -0.6, 1.5, 0.2);
   ctx.fill();
 };
 
@@ -301,7 +304,7 @@ xy.plot = function(datasets) {
       ctx.fillStyle = data[j][3];
 
       ctx.beginPath();
-      ctx.xy.arc(data[j][0], data[j][1], data[j][2], 0, Math.PI * 2);
+      ctx.xywhr.arc(data[j][0], data[j][1], data[j][2], 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
     }
