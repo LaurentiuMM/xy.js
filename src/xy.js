@@ -369,7 +369,7 @@
       };
     }, xy.width);
 
-    return generateTics(parameters.lower, parameters.upper, parameters.incr);
+    return generateTics(parameters.lower, parameters.upper, parameters.incr, xy.width);
   };
 
   function createYTics(xy, datasets) {
@@ -386,21 +386,29 @@
       };
     }, xy.height);
 
-    return generateTics(parameters.lower, parameters.upper, parameters.incr);
+    return generateTics(parameters.lower, parameters.upper, parameters.incr, xy.height);
   }
 
   var effectiveDigitsParser = /0*$|\.\d*|e[+-]\d+/;
 
-  function generateTics(lower, upper, incr) {
+  function generateTics(lower, upper, incr, limit) {
     var effective = effectiveDigitsParser.exec(incr)[0];
-    var power = Math.pow(10, /e/.test(effective)
-      ? -effective.substring(1) : /\./.test(effective) ? effective.length - 1 : -effective.length);
+    var order = /e/.test(effective)
+      ? -effective.substring(1) : /\./.test(effective) ? effective.length - 1 : -effective.length;
     var tics = [];
     var i = 0;
     var t;
     lower = incr * Math.ceil(lower / incr);
-    while ((t = Math.round((lower + i * incr) * power) / power) <= upper) tics[i++] = t;
+    while ((t = round(lower + i * incr, order)) <= upper && i < (limit || Infinity)) tics[i++] = t;
     return tics;
+  }
+
+  function round(v, order) {
+    var power = Math.pow(10, order);
+    var v0 = Math.round(v * power);
+    var v1 = v0 / power;
+    var v2 = v0 * Math.pow(10, -order);
+    return ('' + v1).length <= ('' + v2).length ? v1 : v2;
   }
 
   function setupScalePrameters(parameters, datasets, dim, measureFun, canvasSize) {
