@@ -418,7 +418,8 @@
     if (parameters.upper !== 'auto') upper = parameters.upper;
 
     if (parameters.incr === 'auto') {
-      for (var numberOfTics = 1; numberOfTics < canvasSize; numberOfTics++) {
+      parameters.incr = quantizeTics(upper - lower, 1);
+      for (var numberOfTics = 2; numberOfTics < canvasSize; numberOfTics++) {
         var incr = quantizeTics(upper - lower, numberOfTics);
         var labelSize = measureFun(generateTics(lower, upper, incr));
         if (canvasSize / (labelSize.hop * 1.5) < numberOfTics) break;
