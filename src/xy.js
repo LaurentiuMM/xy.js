@@ -55,10 +55,14 @@
       var xLabelSize = this.xLabelSize = this.measureXLabelSize(this.xTics, opts.labelFontSize, width - xOffset);
       var yOffset = xLabelSize.height + padding;
 
+      xOffset = Math.max(xOffset, xLabelSize.rot === Math.PI / 4 ? xLabelSize.width : xLabelSize.width / 2);
+
       var xLength = this.xLength = xRange[1] - xRange[0];
       var yLength = this.yLength = yRange[1] - yRange[0];
 
-      var xScaling = (width - xOffset - padding) / xLength;
+      var paddingX = Math.max(padding, xLabelSize.rot === Math.PI / 4  ? 0 : xLabelSize.width / 2);
+
+      var xScaling = (width - xOffset - paddingX) / xLength;
       var yScaling = (height - yOffset - padding) / yLength;
 
       (function() {
