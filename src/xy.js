@@ -438,7 +438,7 @@
     return parameters;
   }
 
-  var ticNumbers = [5, 2, 1];
+  var ticNumbers = [10, 5, 2];
 
   function quantizeTics(range, numberOfTics) {
     var order = Math.floor(Math.log(range) * Math.LOG10E);
