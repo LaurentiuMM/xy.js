@@ -404,11 +404,9 @@
   }
 
   function round(v, decimals) {
-    var power = Math.pow(10, decimals);
-    var v0 = Math.round(v * power);
-    var v1 = v0 / power;
-    var v2 = v0 * Math.pow(10, -decimals);
-    return ('' + v1).length <= ('' + v2).length ? v1 : v2;
+    var powered = Math.abs(v) * Math.pow(10, decimals);
+    var precision = powered < 1e21 ? powered.toFixed().length : 21;
+    return +v.toPrecision(precision);
   }
 
   function setupScalePrameters(parameters, datasets, dim, measureFun, canvasSize) {
