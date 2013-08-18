@@ -155,22 +155,22 @@ Options can be passed to the constructor or set via `options` property of the in
 | yTics             | `'auto'`            | tic increment of y-axis, `'auto'` = auto setup           |
 | scale             | `true`              | visibility of scale lines, `true` = show, `false` = hide |
 | scaleColor        | `'rgba(0,0,0,.1)'`  | color of scale lines                                     |
-| scaleWidth        | `1`                 | width of scale lines                                     |
+| scaleWidth        | `1`                 | width of scale lines in px                               |
 | grid              | `true`              | visibility of grid lines, `true` = show, `false` = hide  |
 | gridColor         | `'rgba(0,0,0,.05)'` | color of grid lines                                      |
-| gridWidth         | `1`                 | width of grid lines                                      |
+| gridWidth         | `1`                 | width of grid lines in px                                |
 | label             | `true`              | visibility of grid lines, `true` = show, `false` = hide  |
 | labelFontFamily   | `"'Arial'"`         | font family of label characters                          |
 | labelFontSize     | `20`                | font size of label characters in px                      |
 | labelFontStyle    | `'normal'`          | font style of label characters                           |
 | labelColor        | `'#666'`            | color of label characters                                |
 | point             | `true`              | visibility of points, `true` = show, `false` = hide      |
-| pointCircleRadius | `8`                 | radius of the circles that represent points              |
-| pointStrokeWidth  | `4`                 | width of peripheral line of the circles                  |
+| pointCircleRadius | `8`                 | radius of the circles that represent points in px        |
+| pointStrokeWidth  | `4`                 | width of peripheral line of the circles in px            |
 | line              | `true`              | visibility of lines, `true` = show, `false` = hide       |
-| lineWidth         | `4`                 | width of lines                                           |
+| lineWidth         | `4`                 | width of lines in px                                     |
 | smooth            | `0.3`               | degree of smoothing, falsy = disabled smoothing          |
-| scalingRadius     | `'x'`               | scaling for argument `radius` of the CanvasRenderingContext2D's methods, `'x'` = same scaling as x-axis, `'y'` = same scaling as y-axis |
+| scalingRadius     | `'x'`               | type of scaling for the argument `radius` of the CanvasRenderingContext2D's methods, `'x'` = same scaling as x-axis, `'y'` = same scaling as y-axis |
 
 # Customization
 
@@ -237,10 +237,10 @@ To draw something freely in the above methods, you can use directly the CanvasRe
 | Name    | Description                                                                              |
 | ------- |------------------------------------------------------------------------------------------|
 | ctx     | an instance of the CanvasRenderingContext2D                                              |
-| ctx.xy  | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments `x` and `y` can be specified as coordinates of a standard x-y coordinate system. |
-| ctx.xywhr | an extended version of `ctx.xy` that is added transformations for the arguments `width`, `height` and `radius`. |
-| ctx.nxy | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments `x` and `y` can be specified as coordinates of a normalized version of a x-y coordinate system (the length of x/y-axis range in the chart is normalized to 1). |
-| ctx.nxywhr | an extended version of `ctx.nxy` that is added transformations for the arguments `width`, `height` and `radius`. |
+| ctx.xy  | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments `x` and `y` can be specified as the coordinates of a standard x-y coordinate system. |
+| ctx.xywhr | an extended version of `ctx.xy`. The arguments `width`, `height` and `radius` can be specified based on the scale of the coordinate system in addition to `x` and `y`. |
+| ctx.nxy | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments `x` and `y` can be specified as the coordinates of a normalized version of a x-y coordinate system (the length of x/y-axis range in the chart is normalized to 1). |
+| ctx.nxywhr | an extended version of `ctx.nxy`. The arguments `width`, `height` and `radius` can be specified based on the scale of the coordinate system in addition to `x` and `y`. |
 
 ## Example
 
@@ -272,9 +272,9 @@ var datasets = [
     data: [
       // x, y, radius, color
       [ 1,  0, 0.05, genColor()],
-      [-1,  0, 0.1, genColor()],
+      [-1,  0,  0.1, genColor()],
       [ 0,  1, 0.15, genColor()],
-      [ 0, -1, 0.2, genColor()],
+      [ 0, -1,  0.2, genColor()],
     ]
   }
 ];
@@ -314,9 +314,9 @@ xy.plot = function(datasets) {
 
     for (var j = 0; j < data.length; j++) {
       ctx.fillStyle = data[j > 0 ? j - 1 : data.length - 1][3];
-      var x = Math.round(data[j][0] * 100) / 100;
-      var y = Math.round(data[j][1] * 100) / 100;
-      ctx.xy.fillText('(' + x + ',' + y + ')', data[j][0], data[j][1]);
+      var x = data[j][0];
+      var y = data[j][1];
+      ctx.xy.fillText('(' + x.toPrecision(2) + ',' + y.toPrecision(2) + ')', x, y);
     }
   }
 };
