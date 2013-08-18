@@ -210,7 +210,7 @@
 
   Xy.prototype.drawXGrids = function(tics, yrange) {
     var ctx = this.ctx;
-    for (var i = 1; i < tics.length; i++) {
+    for (var i = 0; i < tics.length; i++) {
       ctx.beginPath();
       ctx.xy.moveTo(tics[i], yrange[0]);
       ctx.xy.lineTo(tics[i], yrange[1]);
@@ -220,7 +220,7 @@
 
   Xy.prototype.drawYGrids = function(tics, xrange) {
     var ctx = this.ctx;
-    for (var i = 1; i < tics.length; i++) {
+    for (var i = 0; i < tics.length; i++) {
       ctx.beginPath();
       ctx.xy.moveTo(xrange[0], tics[i]);
       ctx.xy.lineTo(xrange[1], tics[i]);
