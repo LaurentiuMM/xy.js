@@ -115,8 +115,8 @@
     if (opts.scale) {
       ctx.strokeStyle = opts.scaleColor;
       ctx.lineWidth = opts.scaleWidth;
-      this.drawXScale(this.xRange, this.xTics, this.yTics[0]);
-      this.drawYScale(this.yRange, this.yTics, this.xTics[0]);
+      this.drawXScale(this.xRange, this.xTics, this.yRange[0]);
+      this.drawYScale(this.yRange, this.yTics, this.xRange[0]);
     }
 
     if (opts.label) {
