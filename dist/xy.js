@@ -115,8 +115,8 @@
     if (opts.scale) {
       ctx.strokeStyle = opts.scaleColor;
       ctx.lineWidth = opts.scaleWidth;
-      this.drawXScale(this.xRange, this.xTics, this.yTics[0]);
-      this.drawYScale(this.yRange, this.yTics, this.xTics[0]);
+      this.drawXScale(this.xRange, this.xTics, this.yRange[0]);
+      this.drawYScale(this.yRange, this.yTics, this.xRange[0]);
     }
 
     if (opts.label) {
@@ -210,7 +210,7 @@
 
   Xy.prototype.drawXGrids = function(tics, yrange) {
     var ctx = this.ctx;
-    for (var i = 1; i < tics.length; i++) {
+    for (var i = 0; i < tics.length; i++) {
       ctx.beginPath();
       ctx.xy.moveTo(tics[i], yrange[0]);
       ctx.xy.lineTo(tics[i], yrange[1]);
@@ -220,7 +220,7 @@
 
   Xy.prototype.drawYGrids = function(tics, xrange) {
     var ctx = this.ctx;
-    for (var i = 1; i < tics.length; i++) {
+    for (var i = 0; i < tics.length; i++) {
       ctx.beginPath();
       ctx.xy.moveTo(xrange[0], tics[i]);
       ctx.xy.lineTo(xrange[1], tics[i]);
@@ -389,26 +389,24 @@
     return generateTics(parameters.lower, parameters.upper, parameters.incr, xy.height);
   }
 
-  var effectiveDigitsParser = /0*$|\.\d*|e[+-]\d+/;
+  var roundingDigitsParser = /0*$|\.\d*|e[+-]\d+/;
 
   function generateTics(lower, upper, incr, limit) {
-    var effective = effectiveDigitsParser.exec(incr)[0];
-    var order = /e/.test(effective)
-      ? -effective.substring(1) : /\./.test(effective) ? effective.length - 1 : -effective.length;
+    var roundingDigits = roundingDigitsParser.exec(incr)[0];
+    var decimals = /e/.test(roundingDigits)
+      ? -roundingDigits.substring(1) : /\./.test(roundingDigits) ? roundingDigits.length - 1 : -roundingDigits.length;
     var tics = [];
     var i = 0;
     var t;
     lower = incr * Math.ceil(lower / incr);
-    while ((t = round(lower + i * incr, order)) <= upper && i < (limit || Infinity)) tics[i++] = t;
+    while ((t = round(lower + i * incr, decimals)) <= upper && i < (limit || Infinity)) tics[i++] = t;
     return tics;
   }
 
-  function round(v, order) {
-    var power = Math.pow(10, order);
-    var v0 = Math.round(v * power);
-    var v1 = v0 / power;
-    var v2 = v0 * Math.pow(10, -order);
-    return ('' + v1).length <= ('' + v2).length ? v1 : v2;
+  function round(v, decimals) {
+    var powered = Math.abs(v) * Math.pow(10, decimals);
+    var precision = powered < 1e21 ? powered.toFixed().length : 21;
+    return +v.toPrecision(precision);
   }
 
   function setupScalePrameters(parameters, datasets, dim, measureFun, canvasSize) {
