@@ -389,25 +389,25 @@
     return generateTics(parameters.lower, parameters.upper, parameters.incr, xy.height);
   }
 
-  var effectiveDigitsParser = /0*$|\.\d*|e[+-]\d+/;
+  var roundingDigitsParser = /0*$|\.\d*|e[+-]\d+/;
 
   function generateTics(lower, upper, incr, limit) {
-    var effective = effectiveDigitsParser.exec(incr)[0];
-    var order = /e/.test(effective)
-      ? -effective.substring(1) : /\./.test(effective) ? effective.length - 1 : -effective.length;
+    var roundingDigits = roundingDigitsParser.exec(incr)[0];
+    var decimals = /e/.test(roundingDigits)
+      ? -roundingDigits.substring(1) : /\./.test(roundingDigits) ? roundingDigits.length - 1 : -roundingDigits.length;
     var tics = [];
     var i = 0;
     var t;
     lower = incr * Math.ceil(lower / incr);
-    while ((t = round(lower + i * incr, order)) <= upper && i < (limit || Infinity)) tics[i++] = t;
+    while ((t = round(lower + i * incr, decimals)) <= upper && i < (limit || Infinity)) tics[i++] = t;
     return tics;
   }
 
-  function round(v, order) {
-    var power = Math.pow(10, order);
+  function round(v, decimals) {
+    var power = Math.pow(10, decimals);
     var v0 = Math.round(v * power);
     var v1 = v0 / power;
-    var v2 = v0 * Math.pow(10, -order);
+    var v2 = v0 * Math.pow(10, -decimals);
     return ('' + v1).length <= ('' + v2).length ? v1 : v2;
   }
 
