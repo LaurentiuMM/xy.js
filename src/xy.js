@@ -457,7 +457,7 @@
     for (; range > 0 && numberOfTics > 0; order--) {
       for (var i = 0; i < ticNumbers.length; i++) {
         var test = Math.pow(10, order) * ticNumbers[i];
-        if (range / test > numberOfTics) return incr;
+        if (range / test > numberOfTics) return +incr.toPrecision(1);
         incr = test;
       }
     }
