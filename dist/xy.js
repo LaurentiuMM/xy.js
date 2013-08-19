@@ -57,8 +57,8 @@
 
       xOffset = Math.max(xOffset, xLabelSize.rot === Math.PI / 4 ? xLabelSize.width : xLabelSize.width / 2);
 
-      var xLength = this.xLength = xRange[1] - xRange[0];
-      var yLength = this.yLength = yRange[1] - yRange[0];
+      var xLength = xRange[1] - xRange[0];
+      var yLength = yRange[1] - yRange[0];
 
       var paddingX = Math.max(padding, xLabelSize.rot === Math.PI / 4  ? 0 : xLabelSize.width / 2);
 
@@ -82,7 +82,7 @@
           y: curry2(transformY)(1),
           width: curry2(scaleX)(1),
           height: curry2(scaleY)(1),
-          radius: opts.scalingRadius === 'x' ? curry2(scaleX)(1) : curry2(scaleY)(-1)
+          radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-1) : curry2(scaleX)(1)
         });
 
         ctx.nxy = new Transform(ctx, {
@@ -95,7 +95,7 @@
           y: curry2(transformY)(yLength),
           width: curry2(scaleX)(xLength),
           height: curry2(scaleY)(yLength),
-          radius: opts.scalingRadius === 'x' ? curry2(scaleX)(xLength) : curry2(scaleY)(-yLength)
+          radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-yLength) : curry2(scaleX)(xLength)
         });
       })();
 
@@ -283,8 +283,8 @@
   Xy.prototype.drawLines = function(datasets) {
     var ctx = this.ctx;
     var smooth = this.options.smooth;
-    var xLength = this.xLength;
-    var yLength = this.yLength;
+    var xLength = this.xRange[1] - this.xRange[0];
+    var yLength = this.yRange[1] - this.yRange[0];
 
     for (var i = 0; i < datasets.length; i++) {
 
@@ -457,7 +457,7 @@
     for (; range > 0 && numberOfTics > 0; order--) {
       for (var i = 0; i < ticNumbers.length; i++) {
         var test = Math.pow(10, order) * ticNumbers[i];
-        if (range / test > numberOfTics) return incr;
+        if (range / test > numberOfTics) return +incr.toPrecision(1);
         incr = test;
       }
     }
