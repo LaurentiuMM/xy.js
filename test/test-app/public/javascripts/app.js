@@ -72,10 +72,8 @@ window.onload = function() {
     for (var i = 0; i < datasets.length; i++) {
       var data = datasets[i].data;
       for (var j = 0; j < data.length; j++) {
-        var dx = (Math.random() - 0.5) / xy1.xLength * 0.1;
-        var dy = (Math.random() - 0.5) / xy1.yLength * 0.1;
-        data[j][0] += dx;
-        data[j][1] += dy;
+        data[j][0] += (Math.random() - 0.5) * 0.02;
+        data[j][1] += (Math.random() - 0.5) * 0.02;
       }
     }
 

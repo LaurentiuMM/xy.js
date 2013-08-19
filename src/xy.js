@@ -57,8 +57,8 @@
 
       xOffset = Math.max(xOffset, xLabelSize.rot === Math.PI / 4 ? xLabelSize.width : xLabelSize.width / 2);
 
-      var xLength = this.xLength = xRange[1] - xRange[0];
-      var yLength = this.yLength = yRange[1] - yRange[0];
+      var xLength = xRange[1] - xRange[0];
+      var yLength = yRange[1] - yRange[0];
 
       var paddingX = Math.max(padding, xLabelSize.rot === Math.PI / 4  ? 0 : xLabelSize.width / 2);
 
@@ -283,8 +283,8 @@
   Xy.prototype.drawLines = function(datasets) {
     var ctx = this.ctx;
     var smooth = this.options.smooth;
-    var xLength = this.xLength;
-    var yLength = this.yLength;
+    var xLength = this.xRange[1] - this.xRange[0];
+    var yLength = this.yRange[1] - this.yRange[0];
 
     for (var i = 0; i < datasets.length; i++) {
 
