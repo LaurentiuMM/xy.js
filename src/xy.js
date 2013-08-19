@@ -82,7 +82,7 @@
           y: curry2(transformY)(1),
           width: curry2(scaleX)(1),
           height: curry2(scaleY)(1),
-          radius: opts.scalingRadius === 'x' ? curry2(scaleX)(1) : curry2(scaleY)(-1)
+          radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-1) : curry2(scaleX)(1)
         });
 
         ctx.nxy = new Transform(ctx, {
@@ -95,7 +95,7 @@
           y: curry2(transformY)(yLength),
           width: curry2(scaleX)(xLength),
           height: curry2(scaleY)(yLength),
-          radius: opts.scalingRadius === 'x' ? curry2(scaleX)(xLength) : curry2(scaleY)(-yLength)
+          radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-yLength) : curry2(scaleX)(xLength)
         });
       })();
 
