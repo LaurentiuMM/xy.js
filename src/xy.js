@@ -26,51 +26,51 @@
     }
   }
 
-  Xy.prototype.draw = function(datasets, updateTics) {
+  Xy.prototype.draw = function(datasets, update) {
 
     var ctx = this.ctx;
     var opts = this.options;
 
-    if (!this.xTics || !this.yTics || updateTics) {
-      ctx.font = opts.labelFontStyle + ' ' + opts.labelFontSize + 'px ' + opts.labelFontFamily;
+    if (!this.ticksX || !this.ticksY || update) {
+      ctx.font = opts.labelFontStyle + ' ' + opts.labelFontSize + "px '" + opts.labelFontName + "'";
 
-      this.xTics = createXTics(this, datasets);
-      this.yTics = createYTics(this, datasets);
+      this.ticksX = createTicksX(this, datasets);
+      this.ticksY = createTicksY(this, datasets);
 
-      var xRange = this.xRange = [];
-      var yRange = this.yRange = [];
-      xRange[0] = opts.xRange[0] === 'auto' ? this.xTics[0] : +opts.xRange[0];
-      xRange[1] = opts.xRange[1] === 'auto' ? this.xTics[this.xTics.length - 1] : +opts.xRange[1];
-      yRange[0] = opts.yRange[0] === 'auto' ? this.yTics[0] : +opts.yRange[0];
-      yRange[1] = opts.yRange[1] === 'auto' ? this.yTics[this.yTics.length - 1] : +opts.yRange[1];
+      var rangeX = this.rangeX = [];
+      var rangeY = this.rangeY = [];
+      rangeX[0] = opts.rangeX[0] === 'auto' ? this.ticksX[0] : +opts.rangeX[0];
+      rangeX[1] = opts.rangeX[1] === 'auto' ? this.ticksX[this.ticksX.length - 1] : +opts.rangeX[1];
+      rangeY[0] = opts.rangeY[0] === 'auto' ? this.ticksY[0] : +opts.rangeY[0];
+      rangeY[1] = opts.rangeY[1] === 'auto' ? this.ticksY[this.ticksY.length - 1] : +opts.rangeY[1];
 
       var padding = this.padding = Math.max(opts.labelFontSize / 2, opts.pointCircleRadius + opts.pointStrokeWidth / 2);
 
       var width = this.width;
       var height = this.height;
 
-      var yLabelSize = this.yLabelSize = this.measureYLabelSize(this.yTics, opts.labelFontSize);
-      var xOffset = yLabelSize.width + padding;
+      var labelSizeY = this.labelSizeY = this.measureLabelSizeY(this.ticksY, opts.labelFontSize);
+      var offsetX = labelSizeY.width + padding;
 
-      var xLabelSize = this.xLabelSize = this.measureXLabelSize(this.xTics, opts.labelFontSize, width - xOffset);
-      var yOffset = xLabelSize.height + padding;
+      var labelSizeX = this.labelSizeX = this.measureLabelSizeX(this.ticksX, opts.labelFontSize, width - offsetX);
+      var offsetY = labelSizeX.height + padding;
 
-      xOffset = Math.max(xOffset, xLabelSize.rot === Math.PI / 4 ? xLabelSize.width : xLabelSize.width / 2);
+      offsetX = Math.max(offsetX, labelSizeX.rot === Math.PI / 4 ? labelSizeX.width : labelSizeX.width / 2);
 
-      var xLength = xRange[1] - xRange[0];
-      var yLength = yRange[1] - yRange[0];
+      var lengthX = rangeX[1] - rangeX[0];
+      var lengthY = rangeY[1] - rangeY[0];
 
-      var paddingX = Math.max(padding, xLabelSize.rot === Math.PI / 4  ? 0 : xLabelSize.width / 2);
+      var paddingX = Math.max(padding, labelSizeX.rot === Math.PI / 4  ? 0 : labelSizeX.width / 2);
 
-      var xScaling = (width - xOffset - paddingX) / xLength;
-      var yScaling = (height - yOffset - padding) / yLength;
+      var scalingX = (width - offsetX - paddingX) / lengthX;
+      var scalingY = (height - offsetY - padding) / lengthY;
 
       (function() {
 
-        function transformX(x, length) { return (x * length - xRange[0]) * xScaling + xOffset; }
-        function transformY(y, length) { return (yRange[0] - y * length) * yScaling + height - yOffset; }
-        function scaleX(x, length) { return x * length * xScaling; }
-        function scaleY(y, length) { return -y * length * yScaling; }
+        function transformX(x, length) { return (x * length - rangeX[0]) * scalingX + offsetX; }
+        function transformY(y, length) { return (rangeY[0] - y * length) * scalingY + height - offsetY; }
+        function scaleX(x, length) { return x * length * scalingX; }
+        function scaleY(y, length) { return -y * length * scalingY; }
 
         ctx.xy = new Transform(ctx, {
           x: curry2(transformX)(1),
@@ -86,16 +86,16 @@
         });
 
         ctx.nxy = new Transform(ctx, {
-          x: curry2(transformX)(xLength),
-          y: curry2(transformY)(yLength)
+          x: curry2(transformX)(lengthX),
+          y: curry2(transformY)(lengthY)
         });
 
         ctx.nxywhr = new Transform(ctx, {
-          x: curry2(transformX)(xLength),
-          y: curry2(transformY)(yLength),
-          width: curry2(scaleX)(xLength),
-          height: curry2(scaleY)(yLength),
-          radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-yLength) : curry2(scaleX)(xLength)
+          x: curry2(transformX)(lengthX),
+          y: curry2(transformY)(lengthY),
+          width: curry2(scaleX)(lengthX),
+          height: curry2(scaleY)(lengthY),
+          radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-lengthY) : curry2(scaleX)(lengthX)
         });
       })();
 
@@ -108,15 +108,15 @@
     if (opts.grid) {
       ctx.strokeStyle = opts.gridColor;
       ctx.lineWidth = opts.gridWidth;
-      this.drawXGrids(this.xTics, this.yRange);
-      this.drawYGrids(this.yTics, this.xRange);
+      this.drawXGrids(this.ticksX, this.rangeY);
+      this.drawYGrids(this.ticksY, this.rangeX);
     }
 
     if (opts.scale) {
       ctx.strokeStyle = opts.scaleColor;
       ctx.lineWidth = opts.scaleWidth;
-      this.drawXScale(this.xRange, this.xTics, this.yRange[0]);
-      this.drawYScale(this.yRange, this.yTics, this.xRange[0]);
+      this.drawXScale(this.rangeX, this.ticksX, this.rangeY[0]);
+      this.drawYScale(this.rangeY, this.ticksY, this.rangeX[0]);
     }
 
     if (opts.label) {
@@ -124,18 +124,18 @@
 
       ctx.save();
       ctx.translate(0, this.padding);
-      this.drawXLabels(this.xTics, this.yRange[0], this.xLabelSize.rot);
+      this.drawXLabels(this.ticksX, this.rangeY[0], this.labelSizeX.rot);
       ctx.restore();
 
       ctx.save();
       ctx.translate(-this.padding, 0);
-      this.drawYLabels(this.yTics, this.xRange[0]);
+      this.drawYLabels(this.ticksY, this.rangeX[0]);
       ctx.restore();
     }
 
     ctx.save();
 
-    ctx.rect(this.yLabelSize.width, 0, this.width - this.yLabelSize.width, this.height - this.xLabelSize.height);
+    ctx.rect(this.labelSizeY.width, 0, this.width - this.labelSizeY.width, this.height - this.labelSizeX.height);
     ctx.clip();
 
     if (opts.line) {
@@ -163,11 +163,11 @@
     };
   }
 
-  Xy.prototype.measureXLabelSize = function(tics, fontSize, width) {
+  Xy.prototype.measureLabelSizeX = function(ticks, fontSize, width) {
     var ctx = this.ctx;
     var widest = 0;
-    for (var i = 0; i < tics.length; i++) {
-      var measured = ctx.measureText(tics[i]);
+    for (var i = 0; i < ticks.length; i++) {
+      var measured = ctx.measureText(ticks[i]);
       if (measured.width > widest) widest = measured.width;
     }
     var size = {
@@ -178,7 +178,7 @@
 
     if (!width) return size;
 
-    var hop = width / tics.length;
+    var hop = width / ticks.length;
     if (size.width > hop) {
       size.rot = Math.PI / 4;
       var a = Math.cos(size.rot);
@@ -194,11 +194,11 @@
     return size;
   };
 
-  Xy.prototype.measureYLabelSize = function(tics, fontSize) {
+  Xy.prototype.measureLabelSizeY = function(ticks, fontSize) {
     var ctx = this.ctx;
     var widest = 1;
-    for (var i = 0; i < tics.length; i++) {
-      var size = ctx.measureText(tics[i]);
+    for (var i = 0; i < ticks.length; i++) {
+      var size = ctx.measureText(ticks[i]);
       if (size.width > widest) widest = size.width;
     }
 
@@ -208,83 +208,83 @@
     };
   };
 
-  Xy.prototype.drawXGrids = function(tics, yrange) {
+  Xy.prototype.drawXGrids = function(ticks, rangeY) {
     var ctx = this.ctx;
-    for (var i = 0; i < tics.length; i++) {
+    for (var i = 0; i < ticks.length; i++) {
       ctx.beginPath();
-      ctx.xy.moveTo(tics[i], yrange[0]);
-      ctx.xy.lineTo(tics[i], yrange[1]);
+      ctx.xy.moveTo(ticks[i], rangeY[0]);
+      ctx.xy.lineTo(ticks[i], rangeY[1]);
       ctx.stroke();
     }
   };
 
-  Xy.prototype.drawYGrids = function(tics, xrange) {
+  Xy.prototype.drawYGrids = function(ticks, rangeX) {
     var ctx = this.ctx;
-    for (var i = 0; i < tics.length; i++) {
+    for (var i = 0; i < ticks.length; i++) {
       ctx.beginPath();
-      ctx.xy.moveTo(xrange[0], tics[i]);
-      ctx.xy.lineTo(xrange[1], tics[i]);
+      ctx.xy.moveTo(rangeX[0], ticks[i]);
+      ctx.xy.lineTo(rangeX[1], ticks[i]);
       ctx.stroke();
     }
   };
 
-  Xy.prototype.drawXScale = function(xrange, tics, y) {
+  Xy.prototype.drawXScale = function(rangeX, ticks, y) {
     var ctx = this.ctx;
     ctx.beginPath();
-    ctx.xy.moveTo(xrange[0], y);
-    ctx.xy.lineTo(xrange[1], y);
+    ctx.xy.moveTo(rangeX[0], y);
+    ctx.xy.lineTo(rangeX[1], y);
     ctx.stroke();
   };
 
-  Xy.prototype.drawYScale = function(yrange, tics, x) {
+  Xy.prototype.drawYScale = function(rangeY, ticks, x) {
     var ctx = this.ctx;
     ctx.beginPath();
-    ctx.xy.moveTo(x, yrange[0]);
-    ctx.xy.lineTo(x, yrange[1]);
+    ctx.xy.moveTo(x, rangeY[0]);
+    ctx.xy.lineTo(x, rangeY[1]);
     ctx.stroke();
   };
 
-  Xy.prototype.drawXLabels = function(tics, y, rot) {
+  Xy.prototype.drawXLabels = function(ticks, y, rot) {
     var ctx = this.ctx;
 
     if (rot === 0) {
       ctx.textBaseline = 'top';
       ctx.textAlign = 'center';
 
-      for (var i = 0; i < tics.length; i++) {
-        ctx.xy.fillText(tics[i], tics[i], y);
+      for (var i = 0; i < ticks.length; i++) {
+        ctx.xy.fillText(ticks[i], ticks[i], y);
       }
     } else {
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'right';
       if (rot === Math.PI / 4) ctx.translate(0, this.options.labelFontSize * 0.3);
 
-      for (var i = 0; i < tics.length; i++) {
+      for (var i = 0; i < ticks.length; i++) {
         ctx.save();
 
-        ctx.xy.translate(tics[i], y);
+        ctx.xy.translate(ticks[i], y);
         ctx.rotate(-rot);
-        ctx.fillText(tics[i], 0, 0);
+        ctx.fillText(ticks[i], 0, 0);
 
         ctx.restore();
       }
     }
   };
 
-  Xy.prototype.drawYLabels = function(tics, x) {
+  Xy.prototype.drawYLabels = function(ticks, x) {
     var ctx = this.ctx;
 
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'right';
 
-    for (var i = 0; i < tics.length; i++) ctx.xy.fillText(tics[i], x, tics[i]);
+    for (var i = 0; i < ticks.length; i++) ctx.xy.fillText(ticks[i], x, ticks[i]);
   };
 
   Xy.prototype.drawLines = function(datasets) {
     var ctx = this.ctx;
     var smooth = this.options.smooth;
-    var xLength = this.xRange[1] - this.xRange[0];
-    var yLength = this.yRange[1] - this.yRange[0];
+    var lengthX = this.rangeX[1] - this.rangeX[0];
+    var lengthY = this.rangeY[1] - this.rangeY[0];
 
     for (var i = 0; i < datasets.length; i++) {
 
@@ -301,8 +301,8 @@
 
         for (var j = 0; j < data.length; j++) {
           var newPoint = {
-            x: data[j][0] / xLength,
-            y: data[j][1] / yLength,
+            x: data[j][0] / lengthX,
+            y: data[j][1] / lengthY,
             prev: point
           }
           point = newPoint;
@@ -355,52 +355,52 @@
 
   Xy.prototype.after = function() {};
 
-  function createXTics(xy, datasets) {
+  function createTicksX(xy, datasets) {
 
     var parameters = setupScalePrameters({
-      lower: xy.options.xRange[0],
-      upper: xy.options.xRange[1],
-      incr: xy.options.xTics
-    }, datasets, 0, function(tics) {
-      var size = xy.measureXLabelSize(tics, xy.options.labelFontSize);
+      lower: xy.options.rangeX[0],
+      upper: xy.options.rangeX[1],
+      incr: xy.options.tickStepX
+    }, datasets, 0, function(ticks) {
+      var size = xy.measureLabelSizeX(ticks, xy.options.labelFontSize);
       return {
         offset: size.height,
         hop: size.width
       };
     }, xy.width);
 
-    return generateTics(parameters.lower, parameters.upper, parameters.incr, xy.width);
+    return generateTicks(parameters.lower, parameters.upper, parameters.incr, xy.width);
   };
 
-  function createYTics(xy, datasets) {
+  function createTicksY(xy, datasets) {
 
     var parameters = setupScalePrameters({
-      lower: xy.options.yRange[0],
-      upper: xy.options.yRange[1],
-      incr: xy.options.yTics
-    }, datasets, 1, function(tics) {
-      var size = xy.measureYLabelSize(tics, xy.options.labelFontSize);
+      lower: xy.options.rangeY[0],
+      upper: xy.options.rangeY[1],
+      incr: xy.options.tickStepY
+    }, datasets, 1, function(ticks) {
+      var size = xy.measureLabelSizeY(ticks, xy.options.labelFontSize);
       return {
         offset: size.width,
         hop: size.height
       };
     }, xy.height);
 
-    return generateTics(parameters.lower, parameters.upper, parameters.incr, xy.height);
+    return generateTicks(parameters.lower, parameters.upper, parameters.incr, xy.height);
   }
 
   var roundingDigitsParser = /0*$|\.\d*|e[+-]\d+/;
 
-  function generateTics(lower, upper, incr, limit) {
+  function generateTicks(lower, upper, incr, limit) {
     var roundingDigits = roundingDigitsParser.exec(incr)[0];
     var decimals = /e/.test(roundingDigits)
       ? -roundingDigits.substring(1) : /\./.test(roundingDigits) ? roundingDigits.length - 1 : -roundingDigits.length;
-    var tics = [];
+    var ticks = [];
     var i = 0;
     var t;
     lower = incr * Math.ceil(lower / incr);
-    while ((t = round(lower + i * incr, decimals)) <= upper && i < (limit || Infinity)) tics[i++] = t;
-    return tics;
+    while ((t = round(lower + i * incr, decimals)) <= upper && i < (limit || Infinity)) ticks[i++] = t;
+    return ticks;
   }
 
   function round(v, decimals) {
@@ -429,10 +429,10 @@
 
     if (parameters.incr === 'auto') {
       parameters.incr = quantizeTics(upper - lower, 1);
-      for (var numberOfTics = 2; numberOfTics < canvasSize; numberOfTics++) {
-        var incr = quantizeTics(upper - lower, numberOfTics);
-        var labelSize = measureFun(generateTics(lower, upper, incr));
-        if (canvasSize / (labelSize.hop * 1.5) < numberOfTics) break;
+      for (var numberOfTicks = 2; numberOfTicks < canvasSize; numberOfTicks++) {
+        var incr = quantizeTics(upper - lower, numberOfTicks);
+        var labelSize = measureFun(generateTicks(lower, upper, incr));
+        if (canvasSize / (labelSize.hop * 1.5) < numberOfTicks) break;
         parameters.incr = incr;
       }
     }
@@ -448,16 +448,16 @@
     return parameters;
   }
 
-  var ticNumbers = [10, 5, 2];
+  var tickNumbers = [10, 5, 2];
 
-  function quantizeTics(range, numberOfTics) {
+  function quantizeTics(range, numberOfTicks) {
     var order = Math.floor(Math.log(range) * Math.LOG10E);
     var incr = 0;
 
-    for (; range > 0 && numberOfTics > 0; order--) {
-      for (var i = 0; i < ticNumbers.length; i++) {
-        var test = Math.pow(10, order) * ticNumbers[i];
-        if (range / test > numberOfTics) return +incr.toPrecision(1);
+    for (; range > 0 && numberOfTicks > 0; order--) {
+      for (var i = 0; i < tickNumbers.length; i++) {
+        var test = Math.pow(10, order) * tickNumbers[i];
+        if (range / test > numberOfTicks) return +incr.toPrecision(1);
         incr = test;
       }
     }
@@ -491,10 +491,10 @@
 
   Xy.defaults = {
 
-    xRange: ['auto', 'auto'],
-    yRange: ['auto', 'auto'],
-    xTics: 'auto',
-    yTics: 'auto',
+    rangeX: ['auto', 'auto'],
+    rangeY: ['auto', 'auto'],
+    tickStepX: 'auto',
+    tickStepY: 'auto',
 
     scale: true,
     scaleColor: 'rgba(0,0,0,.1)',
@@ -505,7 +505,7 @@
     gridWidth: 1,
 
     label: true,
-    labelFontFamily: "'Arial'",
+    labelFontName: 'Arial',
     labelFontSize: 20,
     labelFontStyle: 'normal',
     labelColor: '#666',

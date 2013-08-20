@@ -89,22 +89,22 @@ xy.draw(datasets);
 
 ```javascript
 
-var xy = new Xy(ctx, { xRange: [0, 'auto'] } ); // set lower bound of x-axis to 0
+var xy = new Xy(ctx, { rangeX: [0, 'auto'] } ); // set lower bound of x-axis to 0
 
 xy.draw(datasets);
 ```
 
 ![Fig.5](https://raw.github.com/thunder9/xy.js/master/docs/fig5.png)
 
-## Set fixed tic increment
+## Set fixed tick increment
 
 ```javascript
 
-var xy = new Xy(ctx, { xTics: 0.5 } );
+var xy = new Xy(ctx, { tickStepX: 0.5 } );
 
 xy.draw(datasets);
 
-xy.options.xTics = 0.34;
+xy.options.tickStepX = 0.34;
 
 xy.draw(datasets);
 ```
@@ -122,7 +122,7 @@ var xy = new Xy(ctx);
 setInterval(function() {
 
   // If the second argument of draw() is set to true, the axis range
-  // and tics will be updated based on the current config and datasets.
+  // and ticks will be updated based on the current config and datasets.
   xy.draw(datasets, true);
 
   // Modify datasets here
@@ -149,10 +149,10 @@ Options can be passed to the constructor or set via `options` property of the in
 
 | Name              | Default             | Description                                              |
 | ------------------|---------------------|----------------------------------------------------------|
-| xRange            | `['auto', 'auto']`  | range of x-axis, [lower, upper], `'auto'` = auto setup   |
-| yRange            | `['auto', 'auto']`  | range of y-axis, [lower, upper], `'auto'` = auto setup   |
-| xTics             | `'auto'`            | tic increment of x-axis, `'auto'` = auto setup           |
-| yTics             | `'auto'`            | tic increment of y-axis, `'auto'` = auto setup           |
+| rangeX            | `['auto', 'auto']`  | range of x-axis, [lower, upper], `'auto'` = auto setup   |
+| rangeY            | `['auto', 'auto']`  | range of y-axis, [lower, upper], `'auto'` = auto setup   |
+| tickStepX         | `'auto'`            | tick increment of x-axis, `'auto'` = auto setup          |
+| tickStepY         | `'auto'`            | tick increment of y-axis, `'auto'` = auto setup          |
 | scale             | `true`              | visibility of scale lines, `true` = show, `false` = hide |
 | scaleColor        | `'rgba(0,0,0,.1)'`  | color of scale lines                                     |
 | scaleWidth        | `1`                 | width of scale lines in px                               |
@@ -160,7 +160,7 @@ Options can be passed to the constructor or set via `options` property of the in
 | gridColor         | `'rgba(0,0,0,.05)'` | color of grid lines                                      |
 | gridWidth         | `1`                 | width of grid lines in px                                |
 | label             | `true`              | visibility of grid lines, `true` = show, `false` = hide  |
-| labelFontFamily   | `"'Arial'"`         | font family of label characters                          |
+| labelFontName     | `'Arial'`           | font name of label characters                            |
 | labelFontSize     | `20`                | font size of label characters in px                      |
 | labelFontStyle    | `'normal'`          | font style of label characters                           |
 | labelColor        | `'#666'`            | color of label characters                                |
@@ -178,41 +178,41 @@ Options can be passed to the constructor or set via `options` property of the in
 
 In Xy, all drawing operations are customizable. To define your own drawing operations, you can override the following methods:
 
-### Xy.prototype.measureXLabelSize = function(tics, fontSize, width) {...}
+### Xy.prototype.measureLabelSizeX = function(ticks, fontSize, width) {...}
 
-This method should return an object that has `width`, `height` and `rot` properties. The `width` and `height` properies should be set the maximum sizes of the labels that are drawn based on the given `tics` (array of numbers), `fontSize` (font size of label characters in px) and `width` (the length of x-axis range in px) in px. The `rot` property should be set the rotation angle of the labels.
+This method should return an object that has `width`, `height` and `rot` properties. The `width` and `height` properies should be set the maximum sizes of the labels that are drawn based on the given `ticks` (array of numbers), `fontSize` (font size of label characters in px) and `width` (the length of x-axis range in px) in px. The `rot` property should be set the rotation angle of the labels.
 
-### Xy.prototype.measureYLabelSize = function(tics, fontSize) {...}
+### Xy.prototype.measureLabelSizeY = function(ticks, fontSize) {...}
 
-This method should return an object that has `width` and `height` properties. Each property should be set the maximum sizes of the labels that are drawn based on the given `tics` (array of numbers) and `fontSize` (font size of label characters in px) in px.
+This method should return an object that has `width` and `height` properties. Each property should be set the maximum sizes of the labels that are drawn based on the given `ticks` (array of numbers) and `fontSize` (font size of label characters in px) in px.
 
 ### Xy.prototype.before = function() {}
 
 This method will be called before all drawing operations. You can draw a background graphics in this method.
 
-### Xy.prototype.drawXGrids = function(tics, yrange) {...}
+### Xy.prototype.drawXGrids = function(ticks, rangeY) {...}
 
-This method should draw the grid lines that are crossing at given `tics` (numbers on the x-axis). The lines should be drawn in the given range of y-axis (`yrange`).
+This method should draw the grid lines that are crossing at given `ticks` (numbers on the x-axis). The lines should be drawn in the given range of y-axis (`rangeY`).
 
-### Xy.prototype.drawYGrids = function(tics, xrange) {...}
+### Xy.prototype.drawYGrids = function(ticks, rangeX) {...}
 
-This method should the draw grid lines that are crossing at given `tics` (numbers on the y-axis). The lines should be drawn in the given range of x-axis (`xrange`).
+This method should the draw grid lines that are crossing at given `ticks` (numbers on the y-axis). The lines should be drawn in the given range of x-axis (`rangeX`).
 
-### Xy.prototype.drawXScale = function(xrange, tics, y) {...}
+### Xy.prototype.drawXScale = function(rangeX, ticks, y) {...}
 
-This method should draw the scale line that are crossing at given point of the y-axis (`y`). The line should be drawn in the given range of the x-axis (`xrange`). You can use `tics` (numbers on the x-axis) to draw tics.
+This method should draw the scale line that are crossing at given point of the y-axis (`y`). The line should be drawn in the given range of the x-axis (`rangeX`). You can use `ticks` (numbers on the x-axis) to draw ticks.
 
-### Xy.prototype.drawYScale = function(yrange, tics, x) {...}
+### Xy.prototype.drawYScale = function(rangeY, ticks, x) {...}
 
-This method should draw the scale line that are crossing at given point of the x-axis (`x`). The line should be drawn in the given range of the y-axis (`yrange`). You can use `tics` (numbers on the y-axis) to draw tics.
+This method should draw the scale line that are crossing at given point of the x-axis (`x`). The line should be drawn in the given range of the y-axis (`rangeY`). You can use `ticks` (numbers on the y-axis) to draw ticks.
 
-### Xy.prototype.drawXLabels = function(tics, y, rot) {...}
+### Xy.prototype.drawXLabels = function(ticks, y, rot) {...}
 
-This method should draw the labels (stringified `tics`'s numbers) for the x-axis. The top of the label characters should be located at `y`. The lebels should be rotated at given angle (`rot`).
+This method should draw the labels (stringified `ticks`'s numbers) for the x-axis. The top of the label characters should be located at `y`. The lebels should be rotated at given angle (`rot`).
 
-### Xy.prototype.drawYLabels = function(tics, x) {...}
+### Xy.prototype.drawYLabels = function(ticks, x) {...}
 
-This method should draw the labels (stringified `tics`'s numbers) for the y-axis. The right edge of the labels should be located at `x`.
+This method should draw the labels (stringified `ticks`'s numbers) for the y-axis. The right edge of the labels should be located at `x`.
 
 ### Xy.prototype.drawLines = function(datasets) {...}
 
