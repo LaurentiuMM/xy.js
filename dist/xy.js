@@ -135,6 +135,7 @@
 
     ctx.save();
 
+    ctx.beginPath();
     ctx.rect(this.labelSizeY.width, 0, this.width - this.labelSizeY.width, this.height - this.labelSizeX.height);
     ctx.clip();
 
