@@ -67,7 +67,7 @@ xy.draw(datasets);
 
 ```javascript
 
-var xy = new Xy(ctx, { line: false } );
+var xy = new Xy(ctx, { line: false });
 
 xy.draw(datasets);
 ```
@@ -78,7 +78,7 @@ xy.draw(datasets);
 
 ```javascript
 
-var xy = new Xy(ctx, { point: false } );
+var xy = new Xy(ctx, { point: false });
 
 xy.draw(datasets);
 ```
@@ -100,7 +100,7 @@ xy.draw(datasets);
 
 ```javascript
 
-var xy = new Xy(ctx, { tickStepX: 0.5 } );
+var xy = new Xy(ctx, { tickStepX: 0.5 });
 
 xy.draw(datasets);
 
@@ -159,7 +159,7 @@ Options can be passed to the constructor or set via `options` property of the in
 | grid              | `true`              | visibility of grid lines, `true` = show, `false` = hide  |
 | gridColor         | `'rgba(0,0,0,.05)'` | color of grid lines                                      |
 | gridWidth         | `1`                 | width of grid lines in px                                |
-| label             | `true`              | visibility of grid lines, `true` = show, `false` = hide  |
+| label             | `true`              | visibility of labels, `true` = show, `false` = hide      |
 | labelFontName     | `'Arial'`           | font name of label characters                            |
 | labelFontSize     | `20`                | font size of label characters in px                      |
 | labelFontStyle    | `'normal'`          | font style of label characters                           |
