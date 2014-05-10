@@ -168,7 +168,7 @@
     var ctx = this.ctx;
     var widest = 0;
     for (var i = 0; i < ticks.length; i++) {
-      var measured = ctx.measureText(ticks[i]);
+      var measured = ctx.measureText(this.formatXLabel(ticks[i]));
       if (measured.width > widest) widest = measured.width;
     }
     var size = {
@@ -199,7 +199,7 @@
     var ctx = this.ctx;
     var widest = 1;
     for (var i = 0; i < ticks.length; i++) {
-      var size = ctx.measureText(ticks[i]);
+      var size = ctx.measureText(this.formatYLabel(ticks[i]));
       if (size.width > widest) widest = size.width;
     }
 
@@ -253,7 +253,7 @@
       ctx.textAlign = 'center';
 
       for (var i = 0; i < ticks.length; i++) {
-        ctx.xy.fillText(ticks[i], ticks[i], y);
+        ctx.xy.fillText(this.formatXLabel(ticks[i]), ticks[i], y);
       }
     } else {
       ctx.textBaseline = 'middle';
@@ -265,7 +265,7 @@
 
         ctx.xy.translate(ticks[i], y);
         ctx.rotate(-rot);
-        ctx.fillText(ticks[i], 0, 0);
+        ctx.fillText(this.formatXLabel(ticks[i]), 0, 0);
 
         ctx.restore();
       }
@@ -278,7 +278,15 @@
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'right';
 
-    for (var i = 0; i < ticks.length; i++) ctx.xy.fillText(ticks[i], x, ticks[i]);
+    for (var i = 0; i < ticks.length; i++) ctx.xy.fillText(this.formatYLabel(ticks[i]), x, ticks[i]);
+  };
+
+  Xy.prototype.formatXLabel = function(value) {
+    return value;
+  };
+
+  Xy.prototype.formatYLabel = function(value) {
+    return value;
   };
 
   Xy.prototype.drawLines = function(datasets) {

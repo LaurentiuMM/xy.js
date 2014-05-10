@@ -214,6 +214,14 @@ This method should draw the labels (stringified `ticks`'s numbers) for the x-axi
 
 This method should draw the labels (stringified `ticks`'s numbers) for the y-axis. The right edge of the labels should be located at `x`.
 
+### Xy.prototype.formatXLabel = function(value) {...}
+
+You can specify the format of the labels for the x-axis by returning a formatted string based on each `value` of tick's numbers.
+
+### Xy.prototype.formatYLabel = function(value) {...}
+
+You can specify the format of the labels for the y-axis by returning a formatted string based on each `value` of tick's numbers.
+
 ### Xy.prototype.drawLines = function(datasets) {...}
 
 This method should draw lines or cureves based on the given `datasets`.
