@@ -40,9 +40,9 @@
       var rangeX = this.rangeX = [];
       var rangeY = this.rangeY = [];
       rangeX[0] = opts.rangeX[0] === 'auto' ? this.ticksX[0] : +opts.rangeX[0];
-      rangeX[1] = opts.rangeX[1] === 'auto' ? this.ticksX[this.ticksX.length - 1] : +opts.rangeX[1];
+      rangeX[1] = opts.rangeX[1] === 'auto' ? this.ticksX[Math.max(this.ticksX.length - 1, 0)] : +opts.rangeX[1];
       rangeY[0] = opts.rangeY[0] === 'auto' ? this.ticksY[0] : +opts.rangeY[0];
-      rangeY[1] = opts.rangeY[1] === 'auto' ? this.ticksY[this.ticksY.length - 1] : +opts.rangeY[1];
+      rangeY[1] = opts.rangeY[1] === 'auto' ? this.ticksY[Math.max(this.ticksY.length - 1, 0)] : +opts.rangeY[1];
 
       var padding = this.padding = Math.max(opts.labelFontSize / 2, opts.pointCircleRadius + opts.pointStrokeWidth / 2);
 
@@ -62,8 +62,8 @@
 
       var paddingX = Math.max(padding, labelSizeX.rot === Math.PI / 4  ? 0 : labelSizeX.width / 2);
 
-      var scalingX = (width - offsetX - paddingX) / lengthX;
-      var scalingY = (height - offsetY - padding) / lengthY;
+      var scalingX = lengthX > 0 ? (width - offsetX - paddingX) / lengthX : 1;
+      var scalingY = lengthY > 0 ? (height - offsetY - padding) / lengthY : 1;
 
       (function() {
 
@@ -294,9 +294,9 @@
 
       ctx.beginPath();
 
-      ctx.xy.moveTo(data[0][0], data[0][1]);
+      if (data.length > 0) ctx.xy.moveTo(data[0][0], data[0][1]);
 
-      if (smooth) {
+      if (smooth && data.length > 2) {
         var point = null;
         var points = [];
 
