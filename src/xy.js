@@ -18,8 +18,9 @@
     this.height = ctx.canvas.height;
 
     if (window.devicePixelRatio) {
-      ctx.canvas.style.width = this.width + 'px';
-      ctx.canvas.style.height = this.height + 'px';
+      var computedStyle = window.getComputedStyle(ctx.canvas);
+      if (computedStyle.width === 'auto') ctx.canvas.style.width = this.width + 'px';
+      if (computedStyle.height === 'auto') ctx.canvas.style.height = this.height + 'px';
       ctx.canvas.width = this.width * window.devicePixelRatio;
       ctx.canvas.height = this.height * window.devicePixelRatio;
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
