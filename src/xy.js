@@ -14,8 +14,8 @@
     ctor.prototype = Xy.defaults;
     this.options = new ctor(opts);
 
-    this.width = ctx.canvas.width;
-    this.height = ctx.canvas.height;
+    this.width = this.options.width || ctx.canvas.width;
+    this.height = this.options.height || ctx.canvas.height;
 
     if (window.devicePixelRatio) {
       var computedStyle = window.getComputedStyle(ctx.canvas);

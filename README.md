@@ -171,6 +171,8 @@ Options can be passed to the constructor or set via `options` property of the in
 | lineWidth         | `4`                 | width of lines in px                                     |
 | smooth            | `0.3`               | degree of smoothing, falsy = disabled smoothing          |
 | scalingRadius     | `'x'`               | type of scaling for the argument `radius` of the CanvasRenderingContext2D's methods, `'x'` = same scaling as x-axis, `'y'` = same scaling as y-axis |
+| width             | `undefined`         | horizontal dimension of canvas in px                     |
+| height            | `undefined`         | vertical dimension of canvas in px                       |
 
 # Customization
 
