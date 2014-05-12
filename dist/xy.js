@@ -14,12 +14,13 @@
     ctor.prototype = Xy.defaults;
     this.options = new ctor(opts);
 
-    this.width = ctx.canvas.width;
-    this.height = ctx.canvas.height;
+    this.width = this.options.width || ctx.canvas.width;
+    this.height = this.options.height || ctx.canvas.height;
 
     if (window.devicePixelRatio) {
-      ctx.canvas.style.width = this.width + 'px';
-      ctx.canvas.style.height = this.height + 'px';
+      var computedStyle = window.getComputedStyle(ctx.canvas);
+      if (computedStyle.width === 'auto') ctx.canvas.style.width = this.width + 'px';
+      if (computedStyle.height === 'auto') ctx.canvas.style.height = this.height + 'px';
       ctx.canvas.width = this.width * window.devicePixelRatio;
       ctx.canvas.height = this.height * window.devicePixelRatio;
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
@@ -40,11 +41,12 @@
       var rangeX = this.rangeX = [];
       var rangeY = this.rangeY = [];
       rangeX[0] = opts.rangeX[0] === 'auto' ? this.ticksX[0] : +opts.rangeX[0];
-      rangeX[1] = opts.rangeX[1] === 'auto' ? this.ticksX[this.ticksX.length - 1] : +opts.rangeX[1];
+      rangeX[1] = opts.rangeX[1] === 'auto' ? this.ticksX[Math.max(this.ticksX.length - 1, 0)] : +opts.rangeX[1];
       rangeY[0] = opts.rangeY[0] === 'auto' ? this.ticksY[0] : +opts.rangeY[0];
-      rangeY[1] = opts.rangeY[1] === 'auto' ? this.ticksY[this.ticksY.length - 1] : +opts.rangeY[1];
+      rangeY[1] = opts.rangeY[1] === 'auto' ? this.ticksY[Math.max(this.ticksY.length - 1, 0)] : +opts.rangeY[1];
 
-      var padding = this.padding = Math.max(opts.labelFontSize / 2, opts.pointCircleRadius + opts.pointStrokeWidth / 2);
+      var pointRadius = opts.pointCircleRadius + opts.pointStrokeWidth / 2;
+      var padding = this.padding = Math.max(opts.labelFontSize / 2, pointRadius);
 
       var width = this.width;
       var height = this.height;
@@ -62,8 +64,11 @@
 
       var paddingX = Math.max(padding, labelSizeX.rot === Math.PI / 4  ? 0 : labelSizeX.width / 2);
 
-      var scalingX = (width - offsetX - paddingX) / lengthX;
-      var scalingY = (height - offsetY - padding) / lengthY;
+      var scalingX = lengthX > 0 ? (width - offsetX - paddingX) / lengthX : 1;
+      var scalingY = lengthY > 0 ? (height - offsetY - padding) / lengthY : 1;
+
+      var pointRadiusX = pointRadius / scalingX;
+      var pointRadiusY = pointRadius / scalingY;
 
       (function() {
 
@@ -136,7 +141,7 @@
     ctx.save();
 
     ctx.beginPath();
-    ctx.rect(this.labelSizeY.width, 0, this.width - this.labelSizeY.width, this.height - this.labelSizeX.height);
+    ctx.xywhr.rect(rangeX[0] - pointRadiusX, rangeY[0] - pointRadiusY, lengthX + pointRadiusX * 2, lengthY + pointRadiusY * 2);
     ctx.clip();
 
     if (opts.line) {
@@ -168,7 +173,7 @@
     var ctx = this.ctx;
     var widest = 0;
     for (var i = 0; i < ticks.length; i++) {
-      var measured = ctx.measureText(ticks[i]);
+      var measured = ctx.measureText(this.formatXLabel(ticks[i]));
       if (measured.width > widest) widest = measured.width;
     }
     var size = {
@@ -199,7 +204,7 @@
     var ctx = this.ctx;
     var widest = 1;
     for (var i = 0; i < ticks.length; i++) {
-      var size = ctx.measureText(ticks[i]);
+      var size = ctx.measureText(this.formatYLabel(ticks[i]));
       if (size.width > widest) widest = size.width;
     }
 
@@ -253,7 +258,7 @@
       ctx.textAlign = 'center';
 
       for (var i = 0; i < ticks.length; i++) {
-        ctx.xy.fillText(ticks[i], ticks[i], y);
+        ctx.xy.fillText(this.formatXLabel(ticks[i]), ticks[i], y);
       }
     } else {
       ctx.textBaseline = 'middle';
@@ -265,7 +270,7 @@
 
         ctx.xy.translate(ticks[i], y);
         ctx.rotate(-rot);
-        ctx.fillText(ticks[i], 0, 0);
+        ctx.fillText(this.formatXLabel(ticks[i]), 0, 0);
 
         ctx.restore();
       }
@@ -278,7 +283,15 @@
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'right';
 
-    for (var i = 0; i < ticks.length; i++) ctx.xy.fillText(ticks[i], x, ticks[i]);
+    for (var i = 0; i < ticks.length; i++) ctx.xy.fillText(this.formatYLabel(ticks[i]), x, ticks[i]);
+  };
+
+  Xy.prototype.formatXLabel = function(value) {
+    return value;
+  };
+
+  Xy.prototype.formatYLabel = function(value) {
+    return value;
   };
 
   Xy.prototype.drawLines = function(datasets) {
@@ -294,9 +307,9 @@
 
       ctx.beginPath();
 
-      ctx.xy.moveTo(data[0][0], data[0][1]);
+      if (data.length > 0) ctx.xy.moveTo(data[0][0], data[0][1]);
 
-      if (smooth) {
+      if (smooth && data.length > 2) {
         var point = null;
         var points = [];
 
