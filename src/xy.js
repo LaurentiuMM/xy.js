@@ -45,7 +45,8 @@
       rangeY[0] = opts.rangeY[0] === 'auto' ? this.ticksY[0] : +opts.rangeY[0];
       rangeY[1] = opts.rangeY[1] === 'auto' ? this.ticksY[Math.max(this.ticksY.length - 1, 0)] : +opts.rangeY[1];
 
-      var padding = this.padding = Math.max(opts.labelFontSize / 2, opts.pointCircleRadius + opts.pointStrokeWidth / 2);
+      var pointRadius = opts.pointCircleRadius + opts.pointStrokeWidth / 2;
+      var padding = this.padding = Math.max(opts.labelFontSize / 2, pointRadius);
 
       var width = this.width;
       var height = this.height;
@@ -65,6 +66,9 @@
 
       var scalingX = lengthX > 0 ? (width - offsetX - paddingX) / lengthX : 1;
       var scalingY = lengthY > 0 ? (height - offsetY - padding) / lengthY : 1;
+
+      var pointRadiusX = pointRadius / scalingX;
+      var pointRadiusY = pointRadius / scalingY;
 
       (function() {
 
@@ -137,7 +141,7 @@
     ctx.save();
 
     ctx.beginPath();
-    ctx.rect(this.labelSizeY.width, 0, this.width - this.labelSizeY.width, this.height - this.labelSizeX.height);
+    ctx.xywhr.rect(rangeX[0] - pointRadiusX, rangeY[0] - pointRadiusY, lengthX + pointRadiusX * 2, lengthY + pointRadiusY * 2);
     ctx.clip();
 
     if (opts.line) {
