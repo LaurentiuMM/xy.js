@@ -252,7 +252,7 @@ To draw something freely in the above methods, you can use directly the CanvasRe
 | ctx.nxy | an object that has proxies of the CanvasRenderingContext2D's methods. The arguments `x` and `y` can be specified as the coordinates of a normalized version of a x-y coordinate system (the length of x/y-axis range in the chart is normalized to 1). |
 | ctx.nxywhr | an extended version of `ctx.nxy`. The arguments `width`, `height` and `radius` can be specified based on the scale of the coordinate system in addition to `x` and `y`. |
 
-## Example
+## Examples
 
 Here is an example that overrides `before` and `plot` methods.
 
@@ -352,6 +352,168 @@ setInterval(function() {
 
 [JSFiddle](http://jsfiddle.net/thunder9/jzHvh/embedded/result,js,html,css,resources/presentation/)
 
+Here is an example that overrides `formatXLabel` method to display date string for x-labels.
+This example also adds a draggable control for changing chart range with Angular.
+
+```javascript
+
+angular.module('example', [])
+.config(function($provide) {
+
+  // Chart settings.
+  $provide.factory('options', function($window) {
+    return {
+      width: $window.document.querySelector('body > div').clientWidth,
+      height: 180,
+      labelFontSize: 15,
+      pointCircleRadius: 4,
+      pointStrokeWidth: 2,
+      lineWidth: 2,
+      smooth: 0
+    }
+  });
+
+  $provide.constant('today', (new Date((new Date()).toDateString())).getTime());
+
+  // Service for generating mock datasets.
+  $provide.factory('datasets', function($window) {
+
+    function gen() {
+      var numPoints = 100;
+      var magY = 200;
+
+      function genDataPoints() {
+        var points = [];
+        for (var i = -numPoints; i < 0; i++) {
+          points.push([i + 1, Math.random() * magY]);
+        }
+        return points;
+      }
+
+      return [
+        {
+          lineColor : 'rgba(220,220,220,1)',
+          pointColor : 'rgba(220,220,220,1)',
+          pointStrokeColor : '#fff',
+          data : genDataPoints()
+        },
+        {
+          lineColor : 'rgba(151,187,205,1)',
+          pointColor : 'rgba(151,187,205,1)',
+          pointStrokeColor : '#fff',
+          data : genDataPoints()
+        }
+      ];
+    }
+
+    return {
+      gen: gen
+    };
+  });
+})
+// Canvas based chart using Xy.
+.directive('chart', function(datasets, today, options, $window, $filter) {
+
+  function link(scope, element, attrs) {
+
+    var ds = datasets.gen();
+
+    scope.$watch('rangeX', function(value) {
+      var data = ds[0].data;
+      var start = data[0][0]
+      var end = data[data.length - 1][0];
+      xy.options.rangeX = [Math.max(start, end - (end - start) * value), end];
+      xy.draw(ds, true);
+    });
+
+    scope.$watch('rangeY', function(value) {
+      xy.options.rangeY = [0, value * 200];
+      xy.draw(ds, true);
+    });
+
+    var xy = new Xy(element.find('canvas')[0].getContext('2d'), options);
+
+    var DAY = 24 * 60 * 60 * 1000;
+
+    // Mix-in a custom `formatXLabel` that converts integer value to date string.
+    // It is also possible to override the Xy.prototype.formatXLabel.
+    xy.formatXLabel = function(value) {
+      return $filter('date')(today + value * DAY, 'yyyy-MM-dd');
+    }
+  }
+
+  return {
+    restrict: 'E',
+    scope: {
+      rangeX: '=',
+      rangeY: '='
+    },
+    link: link,
+    template: '<canvas></canvas>'
+  };
+})
+// Draggable to change chart range. (based on example code of Angular's doc)
+.directive('draggable', function($document) {
+  function link(scope, element, attr) {
+    var startX = 0, startY = 0, x = 0, y = 0;
+
+    element.css({
+     position: 'relative',
+     border: '1px solid red',
+     backgroundColor: 'lightgrey',
+     cursor: 'pointer'
+    });
+
+    element.on('mousedown', function(event) {
+      event.preventDefault();
+      startX = event.pageX - x;
+      startY = event.pageY - y;
+      $document.on('mousemove', mousemove);
+      $document.on('mouseup', mouseup);
+    });
+
+    var canvas = $document.find('canvas')[0];
+
+    function mousemove(event) {
+      y = event.pageY - startY;
+      x = event.pageX - startX;
+      element.css({
+        top: y + 'px',
+        left: x + 'px'
+      });
+      scope.$apply(function(scope) {
+        scope.rangeX = Math.max(0, x / canvas.clientWidth);
+        scope.rangeY = Math.max(0, y / canvas.clientHeight);
+      });
+    }
+
+    function mouseup() {
+      $document.off('mousemove', mousemove);
+      $document.off('mouseup', mouseup);
+    }
+  };
+
+  return {
+    link: link
+  }
+});
+```
+
+```html
+<div ng-app="example" ng-init="rangeX=0; rangeY=0;">
+  <span draggable>
+    Drag me
+  </span>
+  <br>
+  <chart range-x="rangeX" range-y="rangeY"></chart>
+  <chart range-x="rangeX" range-y="rangeY"></chart>
+</div>
+```
+
+![Customize02](https://raw.github.com/thunder9/xy.js/master/docs/customize02.png)
+
+[JSFiddle](http://jsfiddle.net/thunder9/f89G6/embedded/result,js,html,css,resources/presentation/)
+
 # License
 
-Copyright (c) 2013 thunder9 licensed under the MIT license.
+Copyright (c) 2013-2014 thunder9 licensed under the MIT license.
