@@ -59,16 +59,16 @@
 
       offsetX = Math.max(offsetX, labelSizeX.rot === Math.PI / 4 ? labelSizeX.width : labelSizeX.width / 2);
 
-      var lengthX = rangeX[1] - rangeX[0];
-      var lengthY = rangeY[1] - rangeY[0];
+      var lengthX = this.lengthX = rangeX[1] - rangeX[0];
+      var lengthY = this.lengthY = rangeY[1] - rangeY[0];
 
       var paddingX = Math.max(padding, labelSizeX.rot === Math.PI / 4  ? 0 : labelSizeX.width / 2);
 
       var scalingX = lengthX > 0 ? (width - offsetX - paddingX) / lengthX : 1;
       var scalingY = lengthY > 0 ? (height - offsetY - padding) / lengthY : 1;
 
-      var pointRadiusX = pointRadius / scalingX;
-      var pointRadiusY = pointRadius / scalingY;
+      this.pointRadiusX = pointRadius / scalingX;
+      this.pointRadiusY = pointRadius / scalingY;
 
       (function() {
 
@@ -141,7 +141,7 @@
     ctx.save();
 
     ctx.beginPath();
-    ctx.xywhr.rect(rangeX[0] - pointRadiusX, rangeY[0] - pointRadiusY, lengthX + pointRadiusX * 2, lengthY + pointRadiusY * 2);
+    ctx.xywhr.rect(this.rangeX[0] - this.pointRadiusX, this.rangeY[0] - this.pointRadiusY, this.lengthX + this.pointRadiusX * 2, this.lengthY + this.pointRadiusY * 2);
     ctx.clip();
 
     if (opts.line) {
