@@ -1,5 +1,5 @@
 // Xy.js
-// (c) 2013 thunder9 (https://github.com/thunder9)
+// (c) 2013-2014 thunder9 (https://github.com/thunder9)
 // Xy may be freely distributed under the MIT license.
 
 (function() {
@@ -32,79 +32,7 @@
     var ctx = this.ctx;
     var opts = this.options;
 
-    if (!this.ticksX || !this.ticksY || update) {
-      ctx.font = opts.labelFontStyle + ' ' + opts.labelFontSize + "px '" + opts.labelFontName + "'";
-
-      this.ticksX = createTicksX(this, datasets);
-      this.ticksY = createTicksY(this, datasets);
-
-      var rangeX = this.rangeX = [];
-      var rangeY = this.rangeY = [];
-      rangeX[0] = opts.rangeX[0] === 'auto' ? this.ticksX[0] : +opts.rangeX[0];
-      rangeX[1] = opts.rangeX[1] === 'auto' ? this.ticksX[Math.max(this.ticksX.length - 1, 0)] : +opts.rangeX[1];
-      rangeY[0] = opts.rangeY[0] === 'auto' ? this.ticksY[0] : +opts.rangeY[0];
-      rangeY[1] = opts.rangeY[1] === 'auto' ? this.ticksY[Math.max(this.ticksY.length - 1, 0)] : +opts.rangeY[1];
-
-      var pointRadius = opts.pointCircleRadius + opts.pointStrokeWidth / 2;
-      var padding = this.padding = Math.max(opts.labelFontSize / 2, pointRadius);
-
-      var width = this.width;
-      var height = this.height;
-
-      var labelSizeY = this.labelSizeY = this.measureLabelSizeY(this.ticksY, opts.labelFontSize);
-      var offsetX = labelSizeY.width + padding;
-
-      var labelSizeX = this.labelSizeX = this.measureLabelSizeX(this.ticksX, opts.labelFontSize, width - offsetX);
-      var offsetY = labelSizeX.height + padding;
-
-      offsetX = Math.max(offsetX, labelSizeX.rot === Math.PI / 4 ? labelSizeX.width : labelSizeX.width / 2);
-
-      var lengthX = this.lengthX = rangeX[1] - rangeX[0];
-      var lengthY = this.lengthY = rangeY[1] - rangeY[0];
-
-      var paddingX = Math.max(padding, labelSizeX.rot === Math.PI / 4  ? 0 : labelSizeX.width / 2);
-
-      var scalingX = lengthX > 0 ? (width - offsetX - paddingX) / lengthX : 1;
-      var scalingY = lengthY > 0 ? (height - offsetY - padding) / lengthY : 1;
-
-      this.pointRadiusX = pointRadius / scalingX;
-      this.pointRadiusY = pointRadius / scalingY;
-
-      (function() {
-
-        function transformX(x, length) { return (x * length - rangeX[0]) * scalingX + offsetX; }
-        function transformY(y, length) { return (rangeY[0] - y * length) * scalingY + height - offsetY; }
-        function scaleX(x, length) { return x * length * scalingX; }
-        function scaleY(y, length) { return -y * length * scalingY; }
-
-        ctx.xy = new Transform(ctx, {
-          x: curry2(transformX)(1),
-          y: curry2(transformY)(1)
-        });
-
-        ctx.xywhr = new Transform(ctx, {
-          x: curry2(transformX)(1),
-          y: curry2(transformY)(1),
-          width: curry2(scaleX)(1),
-          height: curry2(scaleY)(1),
-          radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-1) : curry2(scaleX)(1)
-        });
-
-        ctx.nxy = new Transform(ctx, {
-          x: curry2(transformX)(lengthX),
-          y: curry2(transformY)(lengthY)
-        });
-
-        ctx.nxywhr = new Transform(ctx, {
-          x: curry2(transformX)(lengthX),
-          y: curry2(transformY)(lengthY),
-          width: curry2(scaleX)(lengthX),
-          height: curry2(scaleY)(lengthY),
-          radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-lengthY) : curry2(scaleX)(lengthX)
-        });
-      })();
-
-    }
+    if (!this.ticksX || !this.ticksY || update) updateChart.call(this, datasets);
 
     ctx.clearRect(0, 0, this.width, this.height);
 
@@ -160,14 +88,6 @@
 
     this.after();
   };
-
-  function curry2(fun) {
-    return function(secondArg) {
-      return function(firstArg) {
-        return fun(firstArg, secondArg);
-      };
-    };
-  }
 
   Xy.prototype.measureLabelSizeX = function(ticks, fontSize, width) {
     var ctx = this.ctx;
@@ -368,6 +288,91 @@
   Xy.prototype.before = function() {};
 
   Xy.prototype.after = function() {};
+
+  function updateChart(datasets) {
+
+    var ctx = this.ctx;
+    var opts = this.options;
+
+    ctx.font = opts.labelFontStyle + ' ' + opts.labelFontSize + "px '" + opts.labelFontName + "'";
+
+    this.ticksX = createTicksX(this, datasets);
+    this.ticksY = createTicksY(this, datasets);
+
+    var rangeX = this.rangeX = [];
+    var rangeY = this.rangeY = [];
+    rangeX[0] = opts.rangeX[0] === 'auto' ? this.ticksX[0] : +opts.rangeX[0];
+    rangeX[1] = opts.rangeX[1] === 'auto' ? this.ticksX[Math.max(this.ticksX.length - 1, 0)] : +opts.rangeX[1];
+    rangeY[0] = opts.rangeY[0] === 'auto' ? this.ticksY[0] : +opts.rangeY[0];
+    rangeY[1] = opts.rangeY[1] === 'auto' ? this.ticksY[Math.max(this.ticksY.length - 1, 0)] : +opts.rangeY[1];
+
+    var pointRadius = opts.pointCircleRadius + opts.pointStrokeWidth / 2;
+    var padding = this.padding = Math.max(opts.labelFontSize / 2, pointRadius);
+
+    var width = this.width;
+    var height = this.height;
+
+    var labelSizeY = this.labelSizeY = this.measureLabelSizeY(this.ticksY, opts.labelFontSize);
+    var offsetX = labelSizeY.width + padding;
+
+    var labelSizeX = this.labelSizeX = this.measureLabelSizeX(this.ticksX, opts.labelFontSize, width - offsetX);
+    var offsetY = labelSizeX.height + padding;
+
+    offsetX = Math.max(offsetX, labelSizeX.rot === Math.PI / 4 ? labelSizeX.width : labelSizeX.width / 2);
+
+    var lengthX = this.lengthX = rangeX[1] - rangeX[0];
+    var lengthY = this.lengthY = rangeY[1] - rangeY[0];
+
+    var paddingX = Math.max(padding, labelSizeX.rot === Math.PI / 4  ? 0 : labelSizeX.width / 2);
+
+    var scalingX = lengthX > 0 ? (width - offsetX - paddingX) / lengthX : 1;
+    var scalingY = lengthY > 0 ? (height - offsetY - padding) / lengthY : 1;
+
+    this.pointRadiusX = pointRadius / scalingX;
+    this.pointRadiusY = pointRadius / scalingY;
+
+    (function() {
+
+      function transformX(x, length) { return (x * length - rangeX[0]) * scalingX + offsetX; }
+      function transformY(y, length) { return (rangeY[0] - y * length) * scalingY + height - offsetY; }
+      function scaleX(x, length) { return x * length * scalingX; }
+      function scaleY(y, length) { return -y * length * scalingY; }
+
+      ctx.xy = new Transform(ctx, {
+        x: curry2(transformX)(1),
+        y: curry2(transformY)(1)
+      });
+
+      ctx.xywhr = new Transform(ctx, {
+        x: curry2(transformX)(1),
+        y: curry2(transformY)(1),
+        width: curry2(scaleX)(1),
+        height: curry2(scaleY)(1),
+        radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-1) : curry2(scaleX)(1)
+      });
+
+      ctx.nxy = new Transform(ctx, {
+        x: curry2(transformX)(lengthX),
+        y: curry2(transformY)(lengthY)
+      });
+
+      ctx.nxywhr = new Transform(ctx, {
+        x: curry2(transformX)(lengthX),
+        y: curry2(transformY)(lengthY),
+        width: curry2(scaleX)(lengthX),
+        height: curry2(scaleY)(lengthY),
+        radius: opts.scalingRadius === 'y' ? curry2(scaleY)(-lengthY) : curry2(scaleX)(lengthX)
+      });
+    })();
+  }
+
+  function curry2(fun) {
+    return function(secondArg) {
+      return function(firstArg) {
+        return fun(firstArg, secondArg);
+      };
+    };
+  }
 
   function createTicksX(xy, datasets) {
 
