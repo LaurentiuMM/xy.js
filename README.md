@@ -240,6 +240,12 @@ You can plot something (based on `datasets` typically) to the clipped chart regi
 
 This method will be called after all drawing operations. You can draw an overlaid graphics in this method.
 
+### Xy.prototype.draw = function(datasets, update) {...}
+
+This method should draw a chart based on the given `datasets` by using other abstract methods.
+The method also should call the `updateChart` internal function to update scales, ranges and ticks for the chart with Xy's core.
+If `update` is true, the update should be forced.
+
 ## Drawing
 
 To draw something freely in the above methods, you can use directly the CanvasRenderingContext2D's methods and its proxies, via the `ctx` / `ctx.xy` / `ctx.xywhr` / `ctx.nxy` / `ctx.nxywhr` properties of the instance.
