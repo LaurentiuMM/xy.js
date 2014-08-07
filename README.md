@@ -246,6 +246,12 @@ This method should draw a chart based on the given `datasets` by using other abs
 The method also should call the `updateChart` internal function to update scales, ranges and ticks for the chart with Xy's core.
 If `update` is true, the update should be forced.
 
+## Helper
+
+### Xy.extend = function(protoProps, staticProps) {...}
+
+Helper function to correctly set up the prototype chain, for subclasses. You can create a subclass that overrides Xy's prototype methods by passing a hash of custom methods as `protoProps`.
+
 ## Drawing
 
 To draw something freely in the above methods, you can use directly the CanvasRenderingContext2D's methods and its proxies, via the `ctx` / `ctx.xy` / `ctx.xywhr` / `ctx.nxy` / `ctx.nxywhr` properties of the instance.

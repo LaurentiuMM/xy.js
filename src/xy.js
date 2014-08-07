@@ -508,6 +508,48 @@
     return dx * dx + dy * dy;
   }
 
+  var hasProp = {}.hasOwnProperty;
+
+  // Extend a given object with all the properties in passed-in object(s).
+  // Based on the Underscore's `extend` function.
+  function extend(obj) {
+    var source, prop;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+      source = arguments[i];
+      for (prop in source) {
+        if (hasProp.call(source, prop)) {
+          obj[prop] = source[prop];
+        }
+      }
+    }
+    return obj;
+  };
+
+  // Helper function to correctly set up the prototype chain, for subclasses.
+  // Based on the Backbone's `extend` helper.
+  Xy.extend = function(protoProps, staticProps) {
+    var parent = this;
+    var child;
+
+    if (protoProps && hasProp.call(protoProps, 'constructor')) {
+      child = protoProps.constructor;
+    } else {
+      child = function(){ return parent.apply(this, arguments); };
+    }
+
+    extend(child, parent, staticProps);
+
+    var Surrogate = function(){ this.constructor = child; };
+    Surrogate.prototype = parent.prototype;
+    child.prototype = new Surrogate;
+
+    if (protoProps) extend(child.prototype, protoProps);
+
+    child.__super__ = parent.prototype;
+
+    return child;
+  };
+
   Xy.defaults = {
 
     rangeX: ['auto', 'auto'],
