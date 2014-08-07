@@ -246,6 +246,10 @@ This method should draw a chart based on the given `datasets` by using other abs
 The method also should call the `updateChart` internal function to update scales, ranges and ticks for the chart with Xy's core.
 If `update` is true, the update should be forced.
 
+### Xy.prototype.hitTest = function(datasets, x, y) {...}
+
+This method should return data points (subset of given `datasets`) that are intersected by given relative position (`x`, `y`) in canvas element.
+
 ## Helper
 
 ### Xy.extend = function(protoProps, staticProps) {...}
@@ -265,6 +269,8 @@ To draw something freely in the above methods, you can use directly the CanvasRe
 | ctx.nxywhr | an extended version of `ctx.nxy`. The arguments `width`, `height` and `radius` can be specified based on the scale of the coordinate system in addition to `x` and `y`. |
 
 ## Examples
+
+### Example 1
 
 Here is an example that overrides `before` and `plot` methods.
 
@@ -363,6 +369,8 @@ setInterval(function() {
 ![Customize01](https://raw.github.com/thunder9/xy.js/master/docs/customize01.png)
 
 [JSFiddle](http://jsfiddle.net/thunder9/jzHvh/embedded/result,js,html,css,resources/presentation/)
+
+### Example 2
 
 Here is an example that overrides `formatXLabel` method to display date string for x-labels.
 This example also adds a draggable control for changing chart range with Angular.
@@ -525,6 +533,70 @@ angular.module('example', [])
 ![Customize02](https://raw.github.com/thunder9/xy.js/master/docs/customize02.png)
 
 [JSFiddle](http://jsfiddle.net/thunder9/f89G6/embedded/result,js,html,css,resources/presentation/)
+
+### Example 3
+
+Here is an example that uses `hitTest` method for displaying a DOM-based tooltip.
+
+```javascript
+
+// Get a DOM element of tooltip.
+var tooltip = document.getElementById('tooltip');
+
+// Get a Canvas element.
+var canvas = document.getElementById('myCanvas');
+
+// Get a Canvas 2d context.
+var ctx = canvas.getContext('2d');
+
+// Create an instance of `Xy`.
+var xy = new Xy(ctx);
+
+// Define datasets
+var datasets = [
+  {
+    lineColor : 'rgba(220,220,220,1)',
+    pointColor : 'rgba(220,220,220,1)',
+    pointStrokeColor : '#fff',
+    data : [[-4, -2], [-2.5, 1.3], [0, 0], [1, 1.5], [3, 1]]
+  },
+  {
+    lineColor : 'rgba(151,187,205,1)',
+    pointColor : 'rgba(151,187,205,1)',
+    pointStrokeColor : '#fff',
+    data : [[-3, 3], [-1, -1], [0.5, 1], [1.5, -3], [2.8, -1.6]]
+  }
+];
+
+// Setup event listener for mousemove.
+canvas.addEventListener('mousemove', function(e) {
+
+  var boundingRect = canvas.getBoundingClientRect();
+  var mouseX = e.clientX - boundingRect.left;
+  var mouseY = e.clientY - boundingRect.top;
+
+  // Get intersected points.
+  var points = xy.hitTest(datasets, mouseX, mouseY);
+
+  if (points.length > 0) {
+    // Display tooltip.
+    tooltip.innerHTML = points[0].data;
+    tooltip.style.left = (mouseX + 25) + 'px';
+    tooltip.style.top = (mouseY - 7) + 'px';
+    tooltip.style.display = 'block';
+  } else {
+    tooltip.style.display = 'none';
+  }
+
+}, false);
+
+// Draw chart
+xy.draw(datasets);
+```
+
+![Customize03](https://raw.github.com/thunder9/xy.js/master/docs/customize03.png)
+
+[JSFiddle](http://jsfiddle.net/thunder9/mpd91zgj/embedded/result,js,html,css,resources/presentation/)
 
 # License
 

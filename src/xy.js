@@ -289,6 +289,37 @@
 
   Xy.prototype.after = function() {};
 
+  Xy.prototype.hitTest = function(datasets, x, y) {
+    var ctx = this.ctx;
+    var radius = this.options.pointCircleRadius;
+
+    var intersected = [];
+
+    ctx.save();
+
+    for (var i = 0; i < datasets.length; i++) {
+      var data = datasets[i].data;
+
+      for (var j = 0; j < data.length; j++) {
+        ctx.beginPath();
+        ctx.xy.arc(data[j][0], data[j][1], radius, 0, 2 * Math.PI);
+        ctx.closePath();
+
+        if (ctx.isPointInPath(x, y)) {
+          intersected.push({
+            datapointIndex: i,
+            dataIndex: j,
+            data: data[j]
+          });
+        }
+      }
+    }
+
+    ctx.restore();
+
+    return intersected;
+  };
+
   function updateChart(datasets) {
 
     var ctx = this.ctx;
