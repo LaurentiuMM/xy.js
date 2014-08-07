@@ -17,14 +17,14 @@
     this.width = this.options.width || ctx.canvas.width;
     this.height = this.options.height || ctx.canvas.height;
 
-    if (window.devicePixelRatio) {
-      var computedStyle = window.getComputedStyle(ctx.canvas);
-      if (computedStyle.width === 'auto') ctx.canvas.style.width = this.width + 'px';
-      if (computedStyle.height === 'auto') ctx.canvas.style.height = this.height + 'px';
-      ctx.canvas.width = this.width * window.devicePixelRatio;
-      ctx.canvas.height = this.height * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    }
+    var computedStyle = window.getComputedStyle(ctx.canvas);
+    if (computedStyle.width === 'auto') ctx.canvas.style.width = this.width + 'px';
+    if (computedStyle.height === 'auto') ctx.canvas.style.height = this.height + 'px';
+
+    var pixcelRatio = window.devicePixelRatio || 1;
+    ctx.canvas.width = this.width * pixcelRatio;
+    ctx.canvas.height = this.height * pixcelRatio;
+    ctx.scale(pixcelRatio, pixcelRatio);
   }
 
   Xy.prototype.draw = function(datasets, update) {
@@ -507,6 +507,48 @@
     var dy = p1.y - p2.y;
     return dx * dx + dy * dy;
   }
+
+  var hasProp = {}.hasOwnProperty;
+
+  // Extend a given object with all the properties in passed-in object(s).
+  // Based on the Underscore's `extend` function.
+  function extend(obj) {
+    var source, prop;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+      source = arguments[i];
+      for (prop in source) {
+        if (hasProp.call(source, prop)) {
+          obj[prop] = source[prop];
+        }
+      }
+    }
+    return obj;
+  };
+
+  // Helper function to correctly set up the prototype chain, for subclasses.
+  // Based on the Backbone's `extend` helper.
+  Xy.extend = function(protoProps, staticProps) {
+    var parent = this;
+    var child;
+
+    if (protoProps && hasProp.call(protoProps, 'constructor')) {
+      child = protoProps.constructor;
+    } else {
+      child = function(){ return parent.apply(this, arguments); };
+    }
+
+    extend(child, parent, staticProps);
+
+    var Surrogate = function(){ this.constructor = child; };
+    Surrogate.prototype = parent.prototype;
+    child.prototype = new Surrogate;
+
+    if (protoProps) extend(child.prototype, protoProps);
+
+    child.__super__ = parent.prototype;
+
+    return child;
+  };
 
   Xy.defaults = {
 
