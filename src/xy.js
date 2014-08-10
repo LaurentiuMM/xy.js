@@ -442,20 +442,25 @@
   var roundingDigitsParser = /0*$|\.\d*|e[+-]\d+/;
 
   function generateTicks(lower, upper, incr, limit) {
+
+    // Get a base 10 exponent for separating "significant" integer part from tick values based on given `incr` with text-based analysis.
     var roundingDigits = roundingDigitsParser.exec(incr)[0];
-    var decimals = /e/.test(roundingDigits)
+    var exponent = /e/.test(roundingDigits)
       ? -roundingDigits.substring(1) : /\./.test(roundingDigits) ? roundingDigits.length - 1 : -roundingDigits.length;
+
     var ticks = [];
     var i = 0;
     var t;
     lower = incr * Math.ceil(lower / incr);
-    while ((t = round(lower + i * incr, decimals)) <= upper && i < (limit || Infinity)) ticks[i++] = t;
+    while ((t = round(lower + i * incr, exponent)) <= upper && i < (limit || Infinity)) ticks[i++] = t;
     return ticks;
   }
 
-  function round(v, decimals) {
-    var powered = Math.abs(v) * Math.pow(10, decimals);
-    var precision = powered < 1e21 ? powered.toFixed().length : 21;
+  // Round value based on given base 10 `exponent`.
+  // This operation will be need for preventing an unexpected decimal value due to the internal format of binary floating point.
+  function round(v, exponent) {
+    var significantPart = Math.abs(v) * Math.pow(10, exponent);
+    var precision = significantPart < 1e21 ? significantPart.toFixed().length : 21;
     return +v.toPrecision(precision);
   }
 
