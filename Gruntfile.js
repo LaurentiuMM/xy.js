@@ -1,14 +1,30 @@
 module.exports = function(grunt) {
-  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
 
   grunt.initConfig({
 
-    concat: {
-      dist: {
-        src: ['src/xy.js', 'src/transform.js'],
-        dest: 'dist/xy.js',
+    browserify: {
+      xy: {
+        files: {
+          'dist/xy.js': ['src/xy.js', 'src/transform.js']
+        },
+        options: {
+          browserifyOptions: {
+            standalone: 'Xy'
+          }
+        }
+      },
+      transform: {
+        files: {
+          'dist/transform.js': ['src/transform.js']
+        },
+        options: {
+          browserifyOptions: {
+            standalone: 'Transform'
+          }
+        }
       },
     },
 
@@ -25,5 +41,5 @@ module.exports = function(grunt) {
   });
 
 
-  grunt.registerTask('default', ['concat', 'uglify']);
+  grunt.registerTask('default', ['browserify', 'uglify']);
 };
